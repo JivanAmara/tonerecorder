@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>RecorderUploadApplet parameters</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+<meta name="Author" content="Phil Burk">
+<meta name="Description" content="Applet parameter reference.">
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+        <h2> Custom Parameters for Transcription</h2>
+        These additional parameters can be used with the ListenUpTranscriber.jar file. See <a href="transcription.html">this page for more information on transcription</a>.
+        <p>You can also use the parameters provided by the <a href="player_parameters.html">PlayerApplet</a> and <a href="recorder_parameters.html">RecorderUploaderApplet</a>. &nbsp; </p>
+        <table border="0" cellpadding="3" bgcolor="#C0C0C0" >
+          <caption>
+          <b>RecorderUploadApplet Parameter Reference</b>
+          </caption>
+          <tr bgcolor="#F8F8FF">
+            <td ALIGN=CENTER><b>Parameter Name</b></td>
+            <td ALIGN=CENTER><b>Meaning</b></td>
+            <td ALIGN=CENTER><b>Default Value</b></td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td><a name="enableSpeechMikeRecording"></a>enableSpeechMikeRecording</td>
+            <td><p>If set to &quot;yes&quot; then allow Philips Speech Mike to start recording. Set to &quot;no&quot; to disable recording feature and leave play, rewind and other features enabled. </p>
+              <p>Important: see also the &quot;<a href="#useSpeechMike">useSpeechMike</a>&quot; parameter. </p></td>
+            <td>yes</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td>sendOnEOL</td>
+            <td><p>If set to &quot;yes&quot; then send the recorded message if the EOL key on the Philips Speech Mike is held for more than two seconds.</p></td>
+            <td>no </td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td>skinFFRew</td>
+            <td><p>The URL of a composite image that contains the extra transport buttons in multiple states. A skin is a single image with 4 rows and 4 columns. The skin can be any size but the width and height must be divisable by 4. </p>
+              <p>Row 1 = fastForward button <br>
+                Row 2 = rewind button <br>
+                Row 3 = toEnd button <br>
+                Row 4 = toBegin button
+              <p>Column 1 = normal <br>
+                Column 2 = disabled <br>
+                Column 3 = mouseOver <br>
+                Column 4 = mouseDown</td>
+            <td>built-in buttons </td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td>transcription</td>
+            <td><p>If set to &quot;yes&quot; then show the extra buttons associated with transcription: toBegin, rewind, fastForward, toEnd. It will also show the playback speed control.</p>
+              <p>You will probably need to use a larger width and height for the Applet to fit the extra GUI components.</p></td>
+            <td>no</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td>useFootPedal</td>
+            <td><p>If set to &quot;yes&quot; then use a USB Foot Pedal to control Applet. The Infinity Foot Pedal is known to work. Others may as well but are not guaranteed. Will install native software if needed.</p></td>
+            <td>no</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td><a name="useSpeechMike">useSpeechMike</a></td>
+            <td><p>If set to &quot;yes&quot; then use Philips Speech Mike to control Applet. Will install native software if needed. See also the &quot;<a href="#enableSpeechMikeRecording">enableSpeechMikeRecording</a>&quot; parameter.</p>
+              </td>
+            <td>no</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td><p>playHotKey<br>
+                recordHotKey<br>
+                pauseHotKey<br>
+                stopHotKey<br>
+                toBeginHotKey<br>
+                rewindHotKey<br>
+                forwardHotKey <br>
+                toEndHotKey </p></td>
+            <td><p>Specify hot keys that can be used to control ListenUp from any application. You could, for example, be using a word processors and hit &quot;F5+ALT+SHIFT&quot; and start playback of audio. </p>
+              <p>The parameter is a string that specifies the hot key to associate with the given function. You specify the key first, followed by the modifiers, separated with '+' characters. The legal modifiers are:</p>
+              <ul>
+                <li>&quot;alt&quot; for the Alt key</li>
+                <li>&quot;ctrl&quot; for the Control key</li>
+                <li>&quot;shift&quot; for the Shift key</li>
+                <li>&quot;os&quot; for the Windows key on Windows and the Apple key when using Macintosh. (Macintosh not yet supported)</li>
+              </ul>
+              <p>For example, to associate the 'P' key with the Alt and Shift modifiers use:</p>
+              <blockquote>
+                <pre>&lt;param name="playHotKey" value="p+alt+shift"> </pre>
+              </blockquote></td>
+            <td>none</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td><p>&nbsp;</p>
+              <p>speechMikeHotKeyF1<br>
+                speechMikeHotKeyF2<br>
+                speechMikeHotKeyF3<br>
+                speechMikeHotKeyF4<br>
+                speechMikeHotKeyEOL</p>
+              <p>&nbsp;</p></td>
+            <td><p>Specify hot keys to be generated if buttons are pressed on the Philips Speech Mike. The codes are the same as for the playHotKey parameter above. Use &quot;space&quot; for the space bar. For example, if you specify</p>
+              <pre>&lt;param name=&quot;speechMikeHotKeyF3&quot; value=&quot;space+ctrl+os&quot; /&gt;
+
+</pre>
+              <p>then pressing the F3 key on a Speech Mike would be the same as pressing  Control+Windows+Spacebar on the keyboard. You can use &quot;f1&quot; to &quot;f12&quot; to generate Function Key presses.<br>
+              </p>
+              <p>(V1.93+)</p></td>
+            <td>none</td>
+          </tr>
+          <tr bgcolor="#F8F8FF">
+            <td>speechMikeBehavior</td>
+            <td><p>Select the mode of behavior for the SpeechMike. Supported behaviors are:</p>
+              <ul>
+                <li>&quot;press&quot; - ListenUp will start recording when the &quot;record&quot; button on the Mike is pressed and stop when it is released. Also the fast forward and rewind buttons will automatically select the end of the recording so it will be erased when recording is started.</li>
+                <li>&quot;toggle&quot; - Original behavior. Record is enabled by pressing record button. Record or playback is toggled by pressing the &quot;PLAY/STOP&quot; button.</li>
+              </ul></td>
+            <td>toggle</td>
+          </tr>
+        </table>
+        <center>
+          <h4> These feature require using the &quot;ListenUpTranscriber.jar&quot; file to the ARCHIVE list<br>
+            for the APPLET tag instead of the &quot;JavaSonicsListenUp*.jar&quot; file.</h4>
+        </center>
+        <!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd -->
+</html>

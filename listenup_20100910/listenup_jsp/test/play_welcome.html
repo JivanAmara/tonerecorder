@@ -1,0 +1,58 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.79 [en] (Windows NT 5.0; U) [Netscape]">
+   <meta name="KeyWords" content="Java, audio, input, output, JavaSonics, recording, plugin, API">
+   <meta name="Description" content="Java API for audio I/O.">
+   <title>Play a Voice Message</title>
+</head>
+<body>
+&nbsp;
+<center><table WIDTH="90%" callpadding="6" >
+<tr VALIGN=CENTER>
+<td BGCOLOR="#DCE2E7">
+<center>
+<h2>
+Play a Voice Message using ListenUp</h2></center>
+</td>
+</tr>
+</table></center>
+
+<p>Return to <a href="index.html">Home Test Page.</a>
+<p>You should hear a voice message play automatically when the Applet appears.
+<p>Troubleshooting:
+<ul>
+<li>
+If you just see a blank rectangle, then you may be missing the JAR files.
+Look in your Java console for details.</li>
+
+<li>
+If you get a popup error dialog with a path to a "listenup.lic" file then
+the license file is not installed or in the wrong folder. Please move it
+to the folder listed in the pop dialog.</li>
+
+<li>
+If you see an Applet but hear no sound, then test your computer speakers
+and try again.</li>
+</ul>
+<applet 
+    CODE="com.softsynth.javasonics.recplay.PlayerApplet"
+    CODEBASE="../codebase"
+    ARCHIVE="JavaSonicsListenUp.jar"
+    NAME="JavaSonicRecorderUploader"
+    WIDTH="300" HEIGHT="90">
+    <!-- Just play this WAV file. -->
+    <param name="sampleURL" value="welcome.wav">
+    <!-- Play automatically as soon as the Applet starts. -->
+    <param name="autoPlay" value="yes">
+</applet>
+<p>
+<b><a href="index.html">Back to ListenUp JSP tests</a></b>.
+<p>More information on ListenUp can be found on the
+<a href="http://www.javasonics.com/listenup/">JavaSonics
+web site</a>.
+<p>(C) 2003 <a href="http://www.softsynth.com" target="_blank">SoftSynth.com</a>,
+Phil Burk and Nick Didkovsky
+</body>
+</html>

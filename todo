@@ -1,0 +1,17 @@
+ - Host on website.  There's a problem creating the uploaded file on
+   the server.  Not sure exactly what it is.
+ - Include CSRF protection for listenup.
+ - Form validation (filename?)
+ - Add fields in recorder for sound/tone/user
+ - Design:
+ 	 - prompting user for unrecorded syllables
+ 	 - remembering user
+ 	 - organizing uploaded files (model for file upload?)
+
+Notes:
+ - form tag must include 'enctype="multipart/form-data"' or file won't upload
+ - listenup file input field is called 'userfile'
+ - Just like a form action value, the upload URL must have a trailing slash
+ 	- If not, you will get a not-so-helpful http 500 error.
+ - Just do an HttpResponse with 'SUCCESS' at the start of the line to have
+ 	the recorder add it to the interface as a notice.

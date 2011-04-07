@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ListenUp and Text Entry Fields</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+   
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+<p>You can upload additional parameters along with the audio recording. These can include <a href="script_methods.html#addNameValuePair">input values from an HTML FORM using JavaScript</a>, or text fields entered in the Java Applet. </p>
+<h2>
+Adding text entry fields to the Applet.</h2>
+<p>You may specify any number of user-defined fields which will show up as
+  TextAreas in the applet.&nbsp; Each field is associated with: </p>
+<ul>
+<li>
+a unique variable name (such as "username")</li>
+
+<li>
+a label which shows up in the GUI (such as "User Name")</li>
+
+<li>
+a default value (such as "nobody")</li>
+<li>a number of rows (typically one, zero for hidden fields) </li>
+</ul>
+
+<p>Field names are identified sequentially, such as fieldName_1, fieldName_2,
+  etc.&nbsp; Their labels are similarly identified as fieldLabel_1, fieldLabel_2,
+  etc ... and not surprisingly their default values are specified as fieldDefault_1,
+  fieldDefault_2, etc </p>
+<p>For example, to add "username" and "comment" fields to our applet, we
+include the following param tags to the applet tag:
+<blockquote>
+<pre>&lt;param name="fieldName_1" value="comment">
+&lt;param name="fieldLabel_1" value="Comment:">
+&lt;param name="fieldDefault_1" value="enter comment here">
+&lt;param name="fieldName_2" value="username"></pre>
+</blockquote>
+<p>If you optionally choose not to define a label, the gui label will be the
+  same as the field name. Not defining a default value inserts an empty string
+  into the text area.</p>
+<h3>Set Width of Column for Labels</h3>
+<p>The column containing the fieldLabels is set to a minimum width. This helps everything line up and look good. The default width is 80 pixels. You can change the width of this column using:</p>
+<blockquote>
+    <pre>&lt;param name="minFieldLabelWidth" value="120"></pre>
+</blockquote>
+<h3>Hidden Fields</h3>
+<p>You can specify a hidden field that will not be visible to the user. This is useful if you want to pass extra information to the server as a name/value pair. To hide a field, set the number of rows to zero. Note that you can also send name/value pairs back to the server by calling <a href="script_methods.html">addNameValuePair</a>() from JavaScript.</p>
+<blockquote>
+  <pre>&lt;param name="fieldRows_3" value="0">
+&lt;param name="fieldDefault_3" value="AW007315">
+&lt;param name="fieldName_3" value="customer_id"></pre>
+</blockquote>
+<h2>
+<a href="../examples/use_text_fields.html" target="_blank">Click Here for
+an Example</a></h2>
+
+[<a href="index.html">Top</a>]&nbsp; [<a href="compression.html">Previous</a>]
+[<a href="recorder_scripted.html">Next</a>]
+<br>
+<!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>

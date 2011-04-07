@@ -1,0 +1,73 @@
+
+Here is some JavaScript to enable or disable HTML buttons
+based on the state of the ListenUp recorder.
+
+// Enable or disable buttons based on recorder state.
+// This is called by the Java Applet when the state changes between
+// recording, playing or stopped.
+function updateForm()
+{
+    var stopped = document.JavaSonicRecorderUploader.isStopped();
+
+    document.recordingForm.recordButton.disabled = !stopped;
+
+    document.recordingForm.stopButton.disabled = stopped;
+
+    document.recordingForm.playButton.disabled =
+        ( !stopped || !document.JavaSonicRecorderUploader.isPlayable() );
+}
+
+// This is called when the Applet is ready to receive JavaScript calls.
+function appletIsReady()
+{
+    // Ask Applet to call updateForm when the audio stops.
+    document.JavaSonicRecorderUploader.setRecorderStateChangedScript("updateForm();");
+	updateForm();
+}
+
+
+// Tell Java Applet to start recording.
+function recordAudio()
+{
+    document.JavaSonicRecorderUploader.record();
+}
+
+// Tell Applet to stop.
+function stopAudio()
+{
+    document.JavaSonicRecorderUploader.stopAudio();
+}
+
+// Tell Java Applet to start playing.
+function playAudio()
+{
+    document.JavaSonicRecorderUploader.play();
+}
+
+-------------- end of JavaScript ------------------------
+
+This HTML FORM uses JavaScript to call the Java Applet.
+It works with Internet Explorer or Netscape on Windows.
+
+<form NAME="recordingForm">
+<input TYPE="BUTTON" NAME="recordButton" VALUE="Record" onClick="if(!this.disabled) recordAudio();">
+<input TYPE="BUTTON" NAME="stopButton"   VALUE="Stop" onClick="if(!this.disabled) stopAudio();">
+<input TYPE="BUTTON" NAME="playButton"   VALUE="Play" onClick="if(!this.disabled) playAudio();">
+</form>
+
+use these parameters for the Applet tag
+    
+    <!-- turn off Transport Control and control it using JavaScript. -->
+    <param name="showTransport" value="no">
+    
+    <!-- Tell Applet to notify JavaScript when it is ready.
+        This prevents calling Applet too soon. -->
+    <param name="readyScript" value="appletIsReady();">
+	
+
+<script>
+// Start off with all the buttons disabled.
+	document.recordingForm.recordButton.disabled = 1;
+	document.recordingForm.stopButton.disabled = 1;
+	document.recordingForm.playButton.disabled = 1;
+</script>

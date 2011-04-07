@@ -1,0 +1,28 @@
+<head>
+
+</head>
+
+<body>
+<p>Upload file form.</p>
+
+    <form action="." enctype="multipart/form-data" method="POST">
+     	{% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <p><input type="submit" value="Submit"></p>
+    </form>
+
+	<FORM ACTION="/handle_upload/" method="post" encType="multipart/form-data">
+		<p>User Comment: 
+		<INPUT value="hello earth" name="userComment" size="60">
+		<br/>
+		Send this local file: 
+		<INPUT type="file" name="this_name_ignored" size="60" >
+		<br/>
+		<INPUT type="hidden" name="duration" value="35.0" >
+		<INPUT type="submit" value="Send File"></p>
+	</FORM>
+
+
+</body>

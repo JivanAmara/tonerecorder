@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>How to Install ListenUp</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+
+
+
+
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+                <h2> Converting Speex to WAV Files on your Server</h2>
+                <p>Speex is a handy format for uploading and storing voice data because it is so small. But not every program can read Speex files. If you want to send someone a message as an email attachment, or import the message into an audio editor, then you might need to convert the Speex file to a WAV file.</p>
+                <p>ListenUp has the ability to decode Speex data, and the ability to write WAV files. We have combined those abilities into a tool called SpeexToWAV. It is a Java application that must be run using a Java virtual machine. You can run this program on your server to convert Speex files to WAV files.</p>
+                <p><strong>Requirements</strong>:</p>
+                <ol>
+                  <li>Your server must have a version of the Java Virtual Machine installed. We recommend that you have Version 1.3 or later.</li>
+                  <li>Your server must have the ListenUp JAR files from the SDK. The SpeexToWAV program is in those JAR files along with the ListenUp Applets.</li>
+                </ol>
+        <h3>How To Convert</h3>
+                <p>Assume you have a Speex file called msgxyz.spx and you want to create a WAV file called outmsg.wav.</p>
+                <p>The application class name is "com.softsynth.javasonics.recplay.SpeexToWAV". Your command line must include this name and a classpath that includes JavaSonicsListenUpUnsigned.jar file and OggXiphSpeexJSUnsigned.jar. The command line finishes with command arguments, as we show below. <br>
+                    <br>
+                Assuming that these two ListenUp JAR files are in a directory called "codebase", here is the command line that you would enter for this example:</p>
+                <pre>java -cp codebase/JavaSonicsListenUpUnsigned.jar;codebase/OggXiphSpeexJSUnsigned.jar   com.softsynth.javasonics.recplay.SpeexToWAV   msgxyz.spx  outmsg.wav</pre>
+                <p> That must all be on one line. Or you can use a &quot;\&quot; continuation character in Unix.</p>
+                <h3>Output Compression</h3>
+                <p>The output WAV file will be in signed 16 bit format, similar to a CD. You can reduce the size of the output file by a factor of almost 4 by using the IMA <strong>ADPCM compression</strong> option. Just add <strong>&quot;-a&quot;</strong> at the end of the command line. Almost every program that can read WAV files supports the IMA ADPCM format. </p>
+                <p>You can also use <strong>&quot;-u&quot;</strong> for <strong>uLaw compression</strong> for a factor of 2 size reduction. Some telephony devices require uLaw compression. </p>
+                <h3>Restrictions on Command Arguments </h3>
+                <ol>
+                    <li>InFile must be before OutFile </li>
+                    <li>InFile name must end with &quot;.spx&quot;</li>
+                    <li>OutFile name must end with &quot;.wav&quot;</li>
+                </ol>
+                <h3>Calling from JSP</h3>
+                <p>If you are running JSP on your server, then you can call the SpeexToWAV methods directly. The Java documentation on these methods follows. Note that your JSP should import the converter resource like so:</p>
+                <blockquote>
+                    <pre>&lt;%@ page import="com.softsynth.javasonics.recplay.SpeexToWAV" %&gt;<br>&lt;%@ page import="com.softsynth.javasonics.util.WAVWriter" %&gt;</pre>
+                </blockquote>
+                <p>Note also that you will need to put JavaSonicsListenUpUnsigned.jar file and the OggXiphSpeexJSUnsigned.jar file in YourWebApp/WEB-INF/lib</p>
+                <blockquote>
+                    <pre>package com.softsynth.javasonics.recplay;
+
+/**
+ * Read a Speex stream, decode it and write to a WAV file image stream.
+ * @param inStream Speex input stream
+ * @param outStream WAV output stream
+ * @param format WAVWriter.FORMAT_S16, FORMAT_U8, FORMAT_IMA_ADPCM or FORMAT_ULAW
+ * @throws IOException
+ */
+public void convertSpeexToWAV( InputStream inStream,
+             OutputStream outStream, int format ) throws IOException
+
+ /**
+ * Convert a Speex file to a Wav file.
+ * @param inFile Speex input file, must end with &quot;.spx&quot;
+ * @param outFile WAV output file, must end with &quot;.wav&quot;
+ * @param format WAVWriter.FORMAT_S16, FORMAT_U8, FORMAT_IMA_ADPCM or FORMAT_ULAW
+ * @throws IOException
+ */
+ public void convertSpeexToWAV( File inFile, File outFile, int format ) throws IOException
+                    </pre>
+                </blockquote>
+                <p> [<a href="index.html">Top</a>]&nbsp;&nbsp;[<a href="ssl_authentication.html">Previous</a>]&nbsp;&nbsp;[<a href="wavtomp3.html">Next</a>] </p>
+        <!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>

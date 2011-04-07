@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ListenUp Release Notes</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->ListenUp Release Notes<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="docs/index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+<h3>V1.98  build 457 on September 10, 2010</h3>
+<ul>
+  <li>Try various sample rates if ListenUp is having trouble opening an audio device. This may reduce the frequency of the rare DeviceUnavailableException.</li>
+  <li>If a DeviceUnavailableException does occur then ListenUp will no longer hang. This will allow the user to upload any recording they have already made.</li>
+  <li>If a USB mic is unplugged during recording then ListenUp will no longer hang.</li>
+</ul>
+<h3>V1.97 build 451 on April 12, 2010</h3>
+<ul>
+  <li>Added &quot;Trusted-Only: true&quot; to manifest in JAR files to work around an unexpected change in Java 1.6.0_19. Sun now tries to block signed Applets from using unsigned library JAR files. Our Speex JAR was unsigned which triggered a warning and could cause the error message &quot;trusted loader attempted to load sandboxed resource&quot;. See Sun's explanation <a href="http://java.sun.com/javase/6/docs/technotes/guides/jweb/mixed_code.html" target="_blank">here</a>. Our tech support forum has more details <a href="http://www.javasonics.com/forum/viewtopic.php?f=17&t=330">here</a>.</li>
+  <li>We now sign the &quot;OggXiphSpeexJS.jar&quot; using our digital certificate and provide &quot;OggXiphSpeexJSUnsigned.jar&quot;.</li>
+  <li>Use informative message for audio device errors in more cases.</li>
+  </ul>
+<h3>V1.96 BETA build 447 on March 19, 2010</h3>
+<ul>
+  <li>New and better looking button images.</li>
+  <li>Error messages for &quot;audio device unavailable&quot; now more informative and less technical. Suggest checking hardware. No longer shows stack dump.</li>
+  <li>Modified error reporting. Now distinguishes between user handled errors like missing mic, vs web developer errors like bad parameters, vs unexpected exceptions that we need to fix.</li>
+  <li>Removed popup menu from PlayerApplet.</li>
+</ul>
+<h3>V1.95 BETA build 444-446 last built on January 20, 2010</h3>
+<h4>Fixes</h4>
+<ul>
+  <li>Avoid a NullPointerException from ImageSlicer by using a BufferedImage. The exception happened occasionally with Safari on Mac.</li>
+  <li>Call JSObject.getWindow() in background thread to avoid hang on Linux in FireFox.</li>
+</ul>
+<h3>V1.94 build 443 September 2, 2009</h3>
+<ul>
+  <li>    Improve detection and reporting of problems with LiveConnect for Java &lt;-&gt; JavaScript communication.</li>
+</ul>
+<h4>Transcription Specific Changes</h4>
+<ul>
+  <li>Normally ListenUp will jump to the beginning of a recording when you try to play from the end. That has been disabled for the Philips Speech Mike play button.</li>
+  <li>For &quot;sendOnEOL&quot;, we now check for an empty recording before starting the countdown.</li>
+</ul>
+<h3>V1.93 build 437 August 24, 2009</h3>
+<h4>Features</h4>
+<ul>
+  <li>Added <a href="docs/script_asp_net.html">ASP.NET docs</a>, an example upload script and <a href="asp_net_test/index.html">test section</a>.</li>
+  <li>Added &quot;buttonBackground&quot; parameter that sets the color of text buttons. Use with &quot;useTextButtons&quot; parameter. The foreground color of the buttons will be that same as &quot;foreground&quot;.</li>
+  <li>Added JavaScript callable method addUploadHeaderPair(name,value) that will add the pair to the HTTP Request header for the next uploaded recording.</li>
+  <li>Added &quot;stateChangeCallback&quot; parameter that overrides the default &quot;LUPJS_StateChanged&quot; function name. Also &quot;timeChangeCallback&quot; and &quot;levelChangeCallback&quot;.</li>
+  <li>The stateChangeCallback will no longer be called when the previousState equals the newState except when the Applet is launched. Then it will be called with (&quot;stopped&quot;,&quot;stopped&quot;).</li>
+  <li>Added &quot;<a href="docs/player_parameters.html">autoPreview</a>&quot; option to RecorderApplet that will rewind and play the last few seconds of audio when <strong>recording</strong> is paused.</li>
+</ul>
+<h4>Fixes</h4>
+<ul>
+  <li>Give user better information on how to solve DeviceUnavailableException, including &quot;close other audio applications&quot;.</li>
+  <li>Prevent a user from accidentally uploading the same recording twice by double clicking on a JavaScript &quot;Send&quot; button.</li>
+  <li>If the required &quot;uploadURL&quot; parameter is missing then ListenUp will now  report a meaningful error instead of a NullPointerException.</li>
+  <li>Fixed race condition in waitUntilStopped() to simplify unit testing.</li>
+  <li>Synchronized erase() so that it would not cause &quot;SegmentedShortArray ran out of segments while reading&quot; message.</li>
+  </ul>
+<h4>Transcription Specific Changes</h4>
+<ul>
+  <li>Added &quot;speechMikeBehavior&quot; parameter that can be set to &quot;press&quot; to record while the button is pressed. The end of the recording is also automatically selected after rewinding or fast-forwarding in this mode.</li>
+  <li>Added &quot;sendOnEOL&quot; parameter so user can upload the recording if the EOL key on a Philips Speech Mike is held for 2 seconds.</li>
+  <li>Detect attempt to use transcription with Microsoft Java and ask user to upgrade to Sun Java.</li>
+  <li>Added &quot;speechMikeHotKeyF1&quot; parameter that allows one to generate hot keys by pressing a button on the Philips Speech Mike. Also &quot;F2&quot;,&quot;F3&quot;,&quot;F4&quot;, and &quot;EOL&quot;.</li>
+  <li>Minimize SpeechMike window after startup.</li>
+</ul>
+<h3>V1.92 build 423 March 10, 2009</h3>
+<ul>
+  <li>Workaround for <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6635462" target="_blank">Sun Java bug #6635462</a> that caused the highlighting of waveforms to draw very slowly.</li>
+  <li>User no longer has to wait three seconds before clicking &quot;NEXT&gt;&gt;&gt;&quot; button in free mode.</li>
+  <li>Fixed problem with setAudioSelection(begin,end) not always updating the display when called from JavaScript.</li>
+  <li>Added <a href="docs/script_asp.html">ASP docs</a>, an example upload script and <a href="asp_test/index.html">test section</a>.</li>
+  <li>Added &quot;ignoreMissingSample&quot; so that ListenUp will fail silently if the sampleURLName is for a missing file. This was added for use in Preview operations for Drupal.</li>
+  <li>Added &quot;speexComplexity&quot; parameter that can be used to control the amount of computation dedicated to compressing Speex audio. Default is 3.</li>
+  <li>Added &quot;waveBackground&quot; and &quot;waveForeground&quot; color parameters. The default is based on the &quot;background&quot; and &quot;foreground&quot; colors.</li>
+  <li>Clicking close box on JavaSonics Alert windows now closes the window.</li>
+  <li>Improved detection of corrupt audio files.</li>
+  <li>Dump contents of corrupt audio files to Java Console to assist debugging.</li>
+  <li>Added JavaScript command setEditable(boolean) and isEditable() to PlayerApplet.</li>
+  <li>Read graphic images from resources in the JAR file. We had used a workaround to support Max OS 9, which we no longer support.</li>
+</ul>
+<h3>V1.90 build 406 November 22, 2008</h3>
+<ul>
+  <li>Added &quot;<a href="docs/recorder_parameters.html">queueUploads</a>&quot; feature that allows one to queue the uploading of multiple recordings in the background while still recording in the foreground.</li>
+  <li>Added <a href="docs/script_methods.html">saveRecordedMessage()</a> method that can be called from JavaScript. The user will be shown a file dialog and allowed to name the file and specify the folder to save it in.</li>
+  <li>Fixed problem with button clicks being ignored if the mouse was moved while the button was pressed.</li>
+  <li>Prevent ListenUp from calling JavaScript while Applet is being shut down to prevent problems with Safari on Mac.</li>
+  <li>General improvements to documentation.</li>
+</ul>
+<h3>V1.89 build 385, September 4, 2008</h3>
+<ul>
+  <li>Added &quot;<a href="docs/player_parameters.html">autoBackStep</a>&quot; feature to PlayerApplet that will rewind a few seconds when playback is paused.</li>
+  <li>Fixed bug introduced in V1.87 that made it impossible to upload recordings when &quot;arrangement&quot; was set to &quot;tall&quot;.</li>
+</ul>
+<h3>V1.88 build 384, August 26, 2008</h3>
+<ul>
+  <li>Fixed bug introduced in V1.87 that caused recordings uploaded after &quot;stashBeforeSend&quot; to be empty.</li>
+  <li>Added example and documentation for &quot;stashBeforeSend&quot;.</li>
+</ul>
+<h3>V1.87 build 383, August 25, 2008</h3>
+<ul>
+  <li>Added support for Philips Speech Mike Classic LFH5262 and other recent models.</li>
+  <li>Added use of LEDs on Speech Mikes to indicate insert or overwrite mode.</li>
+  <li>Changed behavior of player. When playing to the end we now leave the cursor at the end of the recording instead of moving it to the beginning. This allows us to record at the end of the recording more easily.</li>
+  <li>Added ability to save a temporary copy of a recording on the client hard drive.
+    <ul>
+      <li>Added &quot;stashBeforeSend&quot; parameter that will save a copy of the recording before uploading it to the server. The file is temporary and will be deleted after a few days. The number of files that can be stashed is also limited.</li>
+      <li>Added &quot;Load Most Recent Recording&quot; item to popupMenu in WaveForm display.</li>
+      <li>The combination of these features allows a user to recover a recording that would otherwise have been lost because of a network failure.</li>
+    </ul>
+  </li>
+  <li>Changes related to the text based time display.
+    <ul>
+      <li>Added &quot;putTimeOnTop&quot; parameter that puts the time display on the top row along with the buttons. This allows the waveform display to fill the entire bottom row.</li>
+      <li>Added &quot;timeTextSize&quot; parameter to control the time display font size. Default is 12.</li>
+      <li>Added &quot;timeTextBold&quot; parameter that  controls make the time display font bold if &quot;yes&quot;.</li>
+      <li>Allow time display in PlayerApplet if showTimeText is &quot;yes&quot;. Default is &quot;no&quot; for PlayerApplet and &quot;yes&quot; for the recorders.</li>
+    </ul>
+  </li>
+  <li>Enable Send button when recorder is Paused.</li>
+  <li>Put WaveForm display in the CENTER of a BorderLayout so it will expand when a recorder is made bigger.</li>
+  <li>Fixed bug introduced in V1.85 that caused a &quot;license file not found&quot; exception when clicking directly on ListenUp example files on disk. We no longer append a query to license URL when  testing without an HTTP server. Note that this problem did not affect people using ListenUp on the web. It only affected developers.</li>
+  <li>Allow mixed case for SUCCESS, WARNING or ERROR response from &quot;uploadURL&quot; server script. ListenUp used to require upper case.</li>
+</ul>
+<h3>V1.86 build 372, May 12, 2008</h3>
+<ul>
+  <li>Fixed problem with Pause jumping to beginning of the recording. The bug  was introduced in V1.84.</li>
+  <li>Also fixed related problem in Transcription mode where rewinding from the very end of a recording would jump to the beginning.</li>
+</ul>
+<h3>V1.85 build 369, April 22, 2008</h3>
+<ul>
+  <li>Add query to GET of license file so that old license files will not get stuck in proxy caches.</li>
+</ul>
+<h3>V1.84 build 368, March 10, 2008</h3>
+<ul><li>Allow developers to turn off the popup error messages by setting the &quot;showErrorAlerts&quot; parameter to &quot;no&quot;. Error messages will still be written to the Java Console. Some error messages will also be written to the ListenUp Applet panel.</li>
+  <li>Stop cursor at end of recording when &quot;Stop&quot; button is clicked. This makes it easier to stop then continue a recording by appending to the end.</li>
+  <li>If the cursor is at the end of a recording and Play is clicked then ListenUp will automatically rewind and play from the beginning.</li>
+  <li>Add a nicer looking example button Skin.</li>
+</ul>
+<h3>V1.83 build 366, December 12, 2007</h3>
+<ul>
+  <li>Allow customers to turn off the JavaSonics logo using showLogo=no without requiring the &quot;nologo&quot; license option.</li>
+  <li>Use new PHP4 and PHP5 style $_POST instead of $HTTP_POST_VARS in PHP scripts because PHP 3 is now totally obsolete.</li>
+</ul>
+<h3>V1.82 build 363, October 12, 2007</h3>
+<ul>
+  <li>If  image buttons cannot be created for Record, Play, etc. then use text buttons instead. This  prevents a hang or crash on Macintosh that can occur when switching rapidly between pages that contain the ListenUp Applet. The hang is due to a bug (ID#5538401) in  Apple's Java native AWT code.</li>
+</ul>
+<h3>V1.81 build 360, July 27, 2007</h3>
+<ul>
+  <li>Added &quot;showUploader&quot; parameter that can be used to turn off the Send Button and the Status Message together.</li>
+  <li>Added JavaScript callable methods:
+    <ul>
+      <li>setAudioSelection( startTime, endTime ) // in seconds</li>
+      <li>eraseSelected()</li>
+      <li> getMaxPlayableTime() // length of recording in seconds</li>
+    </ul>
+  </li>
+  <li>ERROR returned from server can now be handled by your JavaScript code by calling setUploadFailureScript(code)</li>
+</ul>
+<h3>V1.80. build 356, July 17, 2007</h3>
+<ul>
+  <li>Added new license model that allows free use and displays an advertisement for ListenUp. A license can be purchased to eliminate the advertisement. </li>
+  <li>License file is now called &quot;listenup_license.txt&quot;.</li>
+  <li>Removed &quot;credit&quot; license model.  </li>
+</ul>
+<h3>V1.70, build 338, November 9, 2006</h3>
+<ul>
+    <li>Added workaround for Java bug  that caused clicking on Record button on some rare machines to not respond. This was due to Java not calling mouseEntered() method as expected. This also fixes the problem on Mac OS X where one had to click twice to get it to record. </li>
+</ul>
+<h3>V1.69, build 334, November 4, 2006</h3>
+<ul>
+    <li>Added &quot;sendButtonText&quot; parameter that can be used to change the text in the Send button.</li>
+    <li>Avoid checking for the JavaSonics plugin if JavaSound will be used. This should eliminate some HTTP 404 errors caused by the JavaClassLoader looking for the &quot;SonicNativeSystem class&quot; file. </li>
+</ul>
+<h3>V1.68, build 333, Sept 6, 2006</h3>
+<ul>
+    <li>Signed JAR files with new Thawte digital certificate to fix &quot;expired certificate&quot; message. </li>
+</ul>
+<h3>V1.68, build 332 June 9, 2006</h3>
+<ul>
+    <li>Added a workaround for <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6261423" target="_blank">bug #6261423 in Sun JavaSound</a> that was causing occasional audio glitches and  dropouts. This bug only affected Java 1.5 on Windows. </li>
+</ul>
+<h3>V1.66, build 329 April 24, 2006</h3>
+<p>Several new features were added.</p>
+<ul>
+    <li>Designer can now disable various GUI components using parameters &quot;showPauseButton&quot;, &quot;showVUMeter&quot;, &quot;showPositionDisplay&quot;, and &quot;showTimeText&quot;.</li>
+	<li>Added &quot;protectRecording&quot; parameter that will revent a recording from being erased or recorded over before being uploaded.</li>
+    <li>Added &quot;useURLConnection&quot; that selects high level HTTP class over custom socket based connection. This provides better compatibility with redirection, authentication and other HTTP facilities. </li>
+    <li>Added &quot;requestStateChange&quot;, &quot;requestTimeChange&quot; and &quot;requestLevelChange&quot; for building custom GUIs in JavaScript.</li>
+    <li>Add &quot;timeChangeInterval&quot; to control frequency of time display update.</li>
+    <li>Fixed problem with silent error if Speex JAR not specified. </li>
+    <li>New SpeexToWAV utility.</li>
+    <li>Improved error reporting for file downloads. Now reports original Exception.</li>
+</ul>
+<h3>V1.61, build 320 March 25, 2006</h3>
+<p>This release does not contain new Applet code. It is just an update for some of the examples and documentation. </p>
+<ul>
+    <li> Use $_GET in &quot;php_test/play_message.php&quot; for compatibility with PHP V5.0+</li>
+    <li>Use relative pathname in &quot;php_test/test_write.php&quot; for improved reliability.</li>
+    <li>Misc cleanup in &quot;listenup_jsp&quot; </li>
+</ul>
+<h3>V1.61, build 320 March 21, 2006</h3>
+<ul>
+    <li>Placed Record button to left of play buttons.</li>
+    <li>Allow Mac OS X users with one button mouse to use Control-left-click for deleting the selected region in the editor. </li>
+    <li>Removed &quot;Test&quot; message and version info from initial  message display. </li>
+    <li>Print version info in error reports.</li>
+</ul>
+<h3>V1.60, build 307 January 30, 2006</h3>
+<p>This version introduces the new ListenUp license model.</p>
+<ul>
+    <li>ListenUp usage now licensed through a credit system managed on the JavaSonics server.</li>
+    <li>Customers can now change the domains associated with their license using an online account.</li>
+    <li>Customer with an old style license can still use it by setting the Applet parameter &quot;useLicenseFile&quot; to &quot;yes&quot;.</li>
+    <li>Check for Microsoft JVM to prevent bug related to the presence of a JavaSound API under Java 1.1.</li>
+    <li>Storage and editing of recorded audio data in memory optimized using a segmented virtual array. This can prevent some glitches encountered while downloading large recordings. Fixes [0035]</li>
+    <li>Added &quot;useTextButtons&quot; parameter for the visually impaired because screen readers cannot read image buttons. </li>
+</ul>
+
+<h3>V1.54, build 281, December 9, 2005 - re-signed with new certificate</h3>
+<p>This is the same code as the August 11, 2005 release except it has been re-signed with a new Digital Certificate
+from Thawte. This removes the warning that said the Applet was signed by an untrusted certificate authority.</p>
+
+<h3>V1.54, build 281, August 11, 2005</h3>
+<p>This release contains numerous bug fixes and improvements related to changes of state while background threads are running. Examples include trying to upload a file while still recording, or calling loadRecording() before the previous load has completed. </p>
+<ul>
+    <li>Stop recording automatically if sendRecordedMessage() is called from JavaScript while recording. Fixes [0030]</li>
+    <li>Calling sendRecordedMessage() from JavaScript when teh recording is empty no longer throws an Exception. Fixes [0032]</li>
+    <li>Abort previous loadRecording() if still running when  loadRecording() is called a second time. Fixes [0031]</li>
+    <li>Change default  values for dynamic range compression to better handle noisy office environments. Previous settings were too strong so noise in office was amplified.</li>
+    <li>Force stopAudio  in case Applet is stopped while playing or recording.</li>
+    <li>Abort loadRecording() if still running when Applet stopped.</li>
+    <li>Optimize stop() method for Applets so switching web pages should be faster.</li>
+</ul>
+<h3>V1.53, build 271, July 15, 2005</h3>
+<ul>
+    <li>Provide workaround for bug in FootPedal library that caused an address exception if a page was reloaded while using the footpedal. [0024]</li>
+    <li>Allow record button of Philips Speech Mike to be disabled by setting Applet parameter &quot;enableSpeechMikeRecording&quot;  to &quot;no&quot;.</li>
+    <li>Do not abort the ListenUp application if loadRecording() fails for an IOException.</li>
+    <li>Fix bug that caused a recording alert to appear if JavaScript called record() while playing. The request was ignored so now it does not display the alert. [0015] </li>
+    <li>Abort audio downloading in background when erase() called. Fixes bug [0025].</li>
+    <li>Use AWT1.1 compatible code so that waveform editor works with Microsoft JVM. Fixes bug introduced in V1.52. [0028]</li>
+    <li>Fixed bug that caused ClassCastException when calling record() from JavaScript while downloading a large sound file. [0029] </li>
+</ul>
+<h3>V1.52, build 257, March 14, 2005</h3>
+<ul>
+    <li>Added playBetween(start,end) JavaScript method to play a specfied region. </li>
+    <li>Compress while recording even if editable option is specified.
+    If the user does not edit the recording then the audio will already be compressed and ready for uploading.    </li>
+    <li>Add popup menu when you right click on a selected portion of the waveform.
+    Let's user Delete selected region if editable option is enabled.</li>
+    <li>Dragging mouse off right edge of waveform display selects to end of recording.<li>At customer's request, do not show error messages if Phillips SpeechMike
+    Installation is cancelled or fails.</li>
+</ul>
+<h3>V1.51, build 254, Feb 14, 2005</h3>
+<ul>
+    <li>Added support for HotKeys (eg. F7+ALT+SHIFT) that allow you to control ListenUp while using another application.</li>
+    <li>Fixed problem with a invalid Speex frame rate causing the next run of ListenUp to fail. [0016]</li>
+    <li>Hitting toEnd or toBegin buttons while playing now stops playback. [0018]</li>
+    <li>Play button disabled when playing normally, ie. not fast forwarding or rewinding. [0019] </li>
+    <li>Hitting toEnd or toBegin buttons clears selected region. [0020] </li>
+    <li> Speex compression progress messages no longer show negative percentage when past 30 minute mark. [0023] </li>
+</ul>
+<h3>V1.50, build 251, Feb 06, 2005 </h3>
+<ul>
+    <li>Added |&lt; and &gt;| buttons to go to beginning and end of recording in &quot;transcription&quot; mode.</li>
+    <li>Correct array index exception in PeakCache that occured after recording for 17 minutes.</li>
+    <li>Use default uploadFilename of &quot;untitled.wav&quot; or &quot;untitled.spx&quot; if none specified.</li>
+    <li>Allow long compressions to be cancelled.</li>
+    <li>Added &quot;testSignal&quot; parameter that rapidly fills a recording with sine waves to facilitate testing long record times.  </li>
+</ul>
+<h3>V1.48, build 249, Jan 31, 2005, release candidate</h3>
+<ul>
+    <li>Added &quot;fileCache&quot; option so that long recordings can be cached on disk. Also store temporary buffers used to upload the audio on disk. This requires the use of a signed JAR file and SUN Java.</li>
+    <li>Fixed bug related to the display of  recordings longer than a few minutes.</li>
+    <li>Added PeakCache class that optimizes the drawing of the waveform for long recordings.</li>
+</ul>
+<h3>V1.47, build 240, Jan 20, 2005, release candidate </h3>
+<p>This is a summary of changes since the last official release. It does not include bugs that were created and fixed as part of the  intermediate beta releases.</p>
+<ul>
+    <li>Add "showWaveform" parameter to use a waveform display instead of the scrollbar.</li>
+    <li>Added &quot;editable&quot; support. Editor can insert new audio into middle of recording. Can select portion of waveform and replace.</li>
+    <li>Added support for SSL and HTTPS. Works for Java 1.1 to latest version.</li>
+    <li>Added support for authentication of uploaded audio data. Added &quot;userName&quot; and &quot;password&quot; parameters. See new section on SSL in documentation.</li>
+    <li>Allow loadRecording() to work from JavaScript without having to set an initial sampleURL parameter.</li>
+    <li>Added erase() method callable from JavaScript.</li>
+    <li> Improved exception and error reporting. Allow user to generate stack trace to send to tech support.</li>
+    <li>Refactored audio threads for improved stability.</li>
+    <li>Added support for playing immediately after loadRecording(url,true) by passing flag.</li>
+    <li>Add loadRecordingNoWait() method callable from JavaScript.</li>
+    <li>The loadRecording(url) method now returns an integer to JavaScript. It returns zero if no error, -1 if the download timed out, and -2 if the download failed. More detailed error messages will appear in the Java console.</li>
+    <li>Apply code obfuscation for increased security and reduced JAR size. </li>
+</ul>
+<p>Added Transcription support which can be enabled using a special license.. Note that the use of ListenUp for Medical Transcription has been licensed on an exclusive basis to a customer. ListenUp may still be used for other non-medical transcription purposes. Transcription features include: </p>
+<ul>
+    <li>Support for Infinity Footpedal and Philips Speech Mike.</li>
+    <li>Special Fast Forward, Fast Rewind buttons.</li>
+    <li>Added speed control so that voice can be slowed down or sped up while transcribing. </li>
+</ul>
+<h3>V1.46, build 239, beta</h3>
+<ul>
+    <li>Add loadRecordingNoWait() method callable from JavaScript.</li>
+    <li>The loadRecording(url) method waits until enough data has been downloaded that playback can begin. This fixes bug [0008] that was only in a beta version. </li>
+    <li>The loadRecording(url) method now returns an integer to JavaScript. It returns zero if no error, -1 if the download timed out, and -2 if the download failed. More detailed error messages will appear in the Java console. </li>
+    <li> Fast Forward and Fast Rewind buttons now appear on recording Applets if &quot;transcription&quot; parameter is set.</li>
+    <li>PositionScrollBar is no longer pegged right when recording. This fixes bug [0007] that was only in a beta version.</li>
+</ul>
+<h3>V1.45, build 234, beta</h3>
+<ul>
+	<li>Suppress error messages when footpedal cannot be started or is unplugged at customer's request. Note that device driver will still put up a small HIDWatch alert if footpedal is unplugged while being used. That cannot be suppressed. </li>
+    <li>Added support for playing immediately after loadRecording(url,true) by passing flag.</li>
+    <li>Added support for sampleURL in RecorderUploadApplet.</li>
+	<li>Added isRecording() method to PlayerApplet for JavaScript that just returns false. [0009]</li>
+    <li>Fixed bug relating to loadRecording() of a Speex file followed by erase(), record() and upload() from JavaScript. </li>
+    <li>Fixed bug in PlayerApplet if no sampleURL specified, followed by loadRecording().</li>
+    <li>Fixed bug that caused Record button to not be enabled after loadRecording of a Speex file. [0002] </li>
+    <li>Fixed bug that caused only initial part of a long recording to be shown in WaveForm display after loadRecording(). [0005] </li>
+    <li>Added wait after exec of SpeechMikeServer to prevent race condition the first time it is launched.</li>
+    <li>Clear start/stop points when recording is erased or replaced by new recording.</li>
+    <li>Fixed autoPlay for sampleURL in PlayerAPplet. [0006] </li>
+	<li>Fixed compatibility issue with MS JVM and Java 1.4 for "OggXiphSpeex.jar". [0010]</li>
+</ul>
+<h3>V1.44, build 223, beta</h3>
+<ul>
+    <li>Automatically download and install native libraries for footpedal and Philips Speech Mike for ListenUpTranscriber.jar.</li>
+    <li> Improved exception and error reporting. Allow user to generate stack trace to send to tech support.</li>
+    <li>Prevent ListenUp Java from calling JavaScript during page refresh. This could crash FireFox browser.</li>
+    <li> Fixed bug that caused SecurityException if calling loadRecording() then record() from JavaScript.</li>
+    <li> Prevent access exception in footpedal library if footpedal not plugged in.</li>
+    <li>Fix intermittent NullPointerException in waveform drawing.</li>
+</ul>
+<h3>V1.42, build 211, beta</h3>
+<ul>
+    <li>Added support for Philips Speech Mic using native 'C' server application &quot;transcription/SpeechMikeServer.exe&quot;.</li>
+    <li>Allow editing of pre-recorded messages.</li>
+    <li>Moved erase() functionality to audio thread to prevent race between stopping and erasing.</li>
+    <li>Allow erase() from PlayerApplet.</li>
+    <li>Do not display ugly error message if footpedal not plugged in.</li>
+    <li>Plugin installer uses a target of &quot;_self&quot; when openng the browser window. This gets around the trouble caused by popup blockers. </li>
+</ul>
+<h3>V1.41, build 209, beta</h3>
+<p>Fixed some bugs introduced in V1.40</p>
+<ul>
+    <li>Read &quot;transcription&quot; permission properly from license file.</li>
+    <li>Thumb draggable again in speed control slider</li>
+    <li>erase() method now calls stopAudio() which updates buttons</li>
+    <li>Moved key controls to numeric keypad to prevent interference from footpedal's 'f' and 'w' keys. </li>
+</ul>
+<h3>V1.40, build 208, beta </h3>
+<ul>
+    <li>Added &quot;editable&quot; support. Editor can insert new audio into middle of recording. Can select portion of waveform and replace.</li>
+    <li>Support for Philips Speech Mike. (KeyListener misbehaving in browser.)</li>
+    <li>Reduce memory usage when compressing audio files for uploading.</li>
+    <li>Moved transcription support to new package. Enabled by setting &quot;transcription&quot; parameter to &quot;yes&quot;. </li>
+</ul>
+<h3>V1.34, build 206, beta</h3>
+<ul>
+    <li>Added &quot;trusted&quot; keyword support to license.</li>
+    <li>Allow loadRecording() to work from JavaScript without having to set an initial sampleURL parameter. </li>
+</ul>
+<h3>V1.33, build 200, beta </h3>
+<ul>
+    <li>Added support for SSL and HTTPS. Works for Java 1.1 to latest version.</li>
+    <li>Added support for  authentication of uploaded audio data. Added &quot;userName&quot; and &quot;password&quot; parameters. See new section on SSL in documentation.</li>
+    <li>Added slider that controls playback speed for transcription mode.</li>
+    <li>Use separate doc pages for basic player and recorder Applet instructions.</li>
+</ul>
+<h3>V1.32, build 193, beta</h3>
+<ul>
+    <li>Fix NullPointer in GUI start code for RecorderUploadApplet </li>
+    <li>Trap NoSuchMethodErrors and report to user.</li>
+    <li>Fix potential divide by zero in DynamicGainControl</li>
+</ul>
+<h3>V1.31, build 192, beta</h3>
+<ul>
+    <li>Add "showWaveform" parameter to use a waveform display instead of the scrollbar.</li>
+    <li>The following features require a special "Transcription" license.</li>
+    <li>Added support for Infinity Footpedal</li>
+    <li>Add transcription controls for fast-forward, slow-forward, rewind.</li>
+</ul>
+
+<h3>V1.30, build 191</h3>
+<ul>
+    <li>Allow Pause while recording.</li>
+    <li>Support for loadRecording() call from JavaScript. This lets JavaScript play a file using ListenUp. Requires LiveConnect, which is available on Windows. See &quot;<a href="http://www.javasonics.com/demos/forum/forum_play_scripted.php">http://www.javasonics.com/demos/forum/forum_play_scripted.php</a>&quot; for an example. </li>
+    <li>Support for &quot;ulaw&quot; compression format. This is a 2:1 compression format commonly used by telephone equipment.</li>
+    <li>Fixed bug that could cause previously recorded material to be included with uploaded Speex compressed audio. Other compression formats not affected.</li>
+    <li>Improved silence trimmer so that it will now turn off after two seconds if the audio input is below the threshold. </li>
+    <li>Improved browser navigation in SDK.</li>
+    <li>Align text fields created using fieldName_#</li>
+    <li>Added &quot;minFieldLabelWidth&quot; parameter to set width of column for aligning text fields.</li>
+    <li>Improved documentation.</li>
+</ul>
+<h3>V1.22, build 177, 4/15/04</h3>
+<ul>
+  <li>Fixed bug introduced in V1.19 that caused a NoSuchMethodException when
+  loading, and prevented record() from working when called from JavaScript.
+  The bug only affected operation with Microsoft Java 1.1.  </li>
+</ul>
+<h3>V1.20, build 173, 4/5/04</h3>
+<ul>
+  <li>Support "showLogo" parameter if "nologo" string is in license.</li>
+</ul>
+<h3>V1.19, build 170, 3/26/04</h3>
+<ul>
+  <li>Allow JavaScript to tell ListenUp to start a recording when using Sun Java plugin. ListenUp used to generate a SecurityException.</li>
+  <li>Display small window with recording animation to warn user when recording is triggered by JavaScript.</li>
+  <li>If Sun Java certificate refused, then display an exception when an attempt to record audio fails.</li>
+</ul>
+<h3>V1.14, build 158, 1/18/04</h3>
+<ul>
+  <li>Use _POST in PHP scripts so that they will work even if register_globals is off. A description of register_globals can be found <a href="http://www.php.net/manual/en/configuration.directives.php#ini.register-globals" target="_blank">here</a> in the PHP manual. A detailed explanation of security issues related to can be found <a href="http://www.php.net/manual/en/security.registerglobals.php" target="_blank">here</a>. </li>
+  <li>Upload recording in a background thread instead of the AWT thread. This wil prevent an apparent hang of the GUI when uploading large files over a voice modem.</li>
+  <li>Fix bug that caused NullPointerException if page refreshed when Applet was in an IFrame. IE calls start() again without calling init() first. Bug was due to removing null Label in start() method. </li>
+  <li>Added Applet parameter &quot;debugLevel&quot; that allows web designer to turn on diagnostic messages. Value=&quot;0&quot; for terse, &quot;1&quot; for informative, &quot;2&quot; for verbose.</li>
+  <li>Added timestamps to diagnostic messages printed to the Java console. </li>
+  <li>Send diagnostic messages in a background thread to make the Applet more responsive when using &quot;diagnosticURL&quot;. </li>
+</ul>
+<h3>V1.11, build 153, 11/24/03</h3>
+<ul>
+<li>
+Added support for "u8" format which will produce an unsigned 8 bit WAV file.
+This is a common format for PC based telephone devices such as the Dialogic card.</li>
+
+<li>
+Fixed a bug in the dynamic range compressor that used decay times incorrectly.
+This was causing some unpleasant wavering in volume when the compressor was turned on.</li>
+</ul>
+
+<h3>
+V1.10, build 151, 11/18/03</h3>
+
+<ul>
+<li>
+Listenup no longer waits for message to be completely downloaded before allowing playback.
+If the download rate is more than 2X faster than the playback rate, and we have buffered several
+seconds worth of audio data, then playback can begin. This allows you to start playing very
+long messages within a few seconds even over a voice modem.</li>
+
+<li>
+Improved error message shown when license file is missing.</li>
+
+<li>
+HTTP server response codes are now checked and reported if not in the 200-299 range.</li>
+
+<li>
+Improved Exception handling so more possible Exceptions are reported to diagnosticURL.</li>
+
+<li>
+Fixed bug that caused user message to play even if Applet
+stop()ped while playing welcome message.</li>
+</ul>
+
+<h3>
+V1.02, build 146, 10/30/03</h3>
+
+<ul>
+<li><b>IMPORTANT</b> - Changed name of jar files from "JavaSonicRecorderUploader.jar" to
+"JavaSonicsListenUp.jar" and from "JavaSonicRecorderUploaderUnsigned.jar" to "JavaSonicsListenUpUnsigned.jar".
+Please make appropriate substitutions in your HTML files.</li>
+
+<li>
+Playing of sampleURL continues automatically after welcomeURL is played.</li>
+
+<li>
+Added "readyScript" parameter to PlayerApplet to tell JavaScript when Applet is ready. This
+is used to prevent JavaScript from calling the Applet too early.</li>
+
+<li>
+Handle mixed case domains, eg. "JavaSonics.com" in License Manager. Was failing to validate license in Netscape.</li>
+</ul>
+
+<h3>
+V1.01, build 144, 10/20/03</h3>
+
+<ul>
+<li>
+Fixed permission check in LicenseManager to allow special priveleges.</li>
+</ul>
+
+<p>&nbsp;</p>
+    <!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>

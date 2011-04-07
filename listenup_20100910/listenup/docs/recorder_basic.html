@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Basic ListenUp Recording</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+<!--
+.style2 {color: #FF0099}
+-->
+</style>
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+                <h2>Embedding ListenUp Recorder in a Web Page.</h2>
+                <p>This page describes how to use the recorder Applet in a web page. It is based on the <a href="player_basic.html">previous page</a> which describes how to use the player Applet so you should read that first. </p>
+                <p><font color="#000099"><b>YOUR HTML PAGE</b> <b>NEEDS:</b></font></p>
+                <p> First set up your page as you did for the PlayerApplet.</p>
+                <h3><strong> Changes to Java Applet Tag</strong></h3>
+                <p>You can use an &lt;applet&gt; tag to run the ListenUp Applet. This section describes the various elements of an Applet tag. </p>
+                <p><strong>CODE: </strong>To <strong>record audio</strong> then use <b><strong>code=</strong>&quot;com.softsynth.javasonics.recplay.RecorderUploadApplet&quot;</b>.</p>
+                <p><strong>ARCHIVE:</strong> Use the <strong>JavaSonicsListenUp.jar</strong> file if you want to record audio using the RecorderApplet or the RecorderUploadApplet. It is a signed JAR file that will put up a security dialog on Apple or when using the Sun Java plugin. If the user grants permission then the record audio feature will be enabled. The <strong>OggXiphSpeexJS.jar</strong> file in the <strong>archive</strong> is only needed if you plan to record or play back Speex compressed files. </p>
+                <h3>Example Recorder HTML Code</h3>
+                <p>The parts you are likely to change are in <span class="style2">red</span>. </p>
+                <blockquote>
+                    <pre>&lt;applet&nbsp;
+&nbsp;&nbsp;&nbsp; code="com.softsynth.javasonics.recplay.RecorderUploadApplet"
+&nbsp;&nbsp;&nbsp; codebase="<span class="style2">../codebase</span>"
+&nbsp;&nbsp;&nbsp; archive="JavaSonicsListenUp.jar,OggXiphSpeexJS.jar"
+&nbsp;&nbsp;&nbsp; name="ListenUpRecorder"
+&nbsp;&nbsp;&nbsp; width="500"
+&nbsp;&nbsp;&nbsp; height="240">
+
+&nbsp;&nbsp;&nbsp; &lt;!-- URL for the script which receives the uploaded sound file. --&gt;
+    &lt;param name="uploadURL" value="<span class="style2">handle_upload_simple.php</span>">
+
+    &lt;!-- Name of uploaded sound file. Server can change it if needed. --&gt;
+    &lt;param name="uploadFileName" value="<span class="style2">whatever.wav</span>">
+<br>&lt;/applet></pre>
+                </blockquote>
+               
+                    <h2> <a href="../examples/record_upload_wav.html" target="_blank"> Click Here for a Simple Recording Example!</a> </h2>
+                [<a href="index.html">Top</a>] [<a href="player_basic.html">Previous</a>] [<a href="server_scripts.html">Next</a>] <!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>

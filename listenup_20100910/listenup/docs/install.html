@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>How to Install ListenUp</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+      
+
+
+
+
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+<h2>
+Installing and Testing ListenUp on your Server</h2>
+<p>If you are using <b>JSP</b>, Java
+        Server Pages, to receive the uploaded files on your server, then <a href="/listenup_jsp/">please click here</a>.</p>
+<p>If you are using <strong>PHP, or other scripting languages</strong>, then please continue.</p>
+<h3>
+Step #1 - Copy ListenUp to Server</h3>
+<p>Copy the "listenup" folder from the SDK to your website. It contains examples, tests and documentation. We will remove most of that SDK when we are done testing.</p>
+<h3>
+Step #2 - Make the &quot;uploads&quot; Folder Writable </h3>
+<p>You will need to <b>give the scripts permission to write the uploaded files</b> to the "listenup/uploads" folder. You may be able to do this using your
+    FTP client. Or you may need to login to the server and set them by hand.
+    If you trust everyone on your server then you could set global write permissions on Linux using: </p>
+<blockquote>
+<pre>cd {your website path}/listenup/
+chmod 777 uploads</pre></blockquote>
+<p>If global write permission is too scary, then you may be able to just use
+    group write permission. You will need to determine the group used by your
+    PHP module. I did that by first setting global write permission. Finishing
+    this installation. Uploading a few files. Then looking to see what group
+    they belonged to. In my case it was the "apache" group. Then I went back
+    and did: </p>
+<blockquote>
+<pre>chgrp apache uploads
+chmod 775 uploads</pre>
+</blockquote>
+
+<h3>Step #3 - Test&nbsp; Installation</h3>
+<p>If you are using PHP, then you are ready to test ListenUp on your server.
+  If you are using another scripting language, then click [Next] below.
+</p>
+<h4>
+Test Using PHP</h4>
+<p>To test the installation, use your browser to <b>visit the "listenup" folder
+  on your website</b>. If you have a website called "<i>www.mysite.com</i>",
+  and you placed the "listenup" folder at the top of your website, then visit: </p>
+<blockquote><tt><a href="/listenup/php_test">http://www.mysite.com/listenup/php_test/</a></tt></blockquote>
+<p>Make sure you are actually on your website. Then follow the instructions on that page to verify that the installation is
+    working OK.</p>
+<h3>Step #4 - Development</h3>
+<p>Now write your own web pages that use ListenUp. If you are uploading recordings then write your own server scripts to receive the uploaded files. The documentation pages that follow will explain how to do this.</p>
+<h3>Step #5 - Cleanup</h3>
+<p>When you are done testing and your application runs, please remove the ListenUp tests, examples, and documentation from your website so that search engines do not find it and get confused. All you really need to run ListenUp is: </p>
+<ol>
+  <li>The JAR files that you are calling.</li>
+  <li>The listenup_license.txt file next to the JAR files.</li>
+  <li>Your own web pages, server scripts, upload directory and optional skins that you design.</li>
+</ol>
+<p>
+        [<a href="index.html">Top</a>]&nbsp; [<a href="overview.html">Previous</a>]
+        [<a href="player_basic.html">Next</a>] </p>
+<!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html><!-- InstanceBegin template="/Templates/sdkDoc.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../style_sdk.css" rel="stylesheet" type="text/css"/>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ListenUp and JavaScript</title>
+<!-- InstanceEndEditable --><!-- InstanceBeginEditable name="head" -->
+<meta name="KeyWords" content="Java, audio, input, output, JavaSonics, recording, plugin, API">
+<meta name="Description" content="Java API for audio I/O.">
+<!-- InstanceEndEditable -->
+</head>
+<body>
+<center>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="middle">
+      <td width="200" bgcolor="#DCE2E7"><center>
+          <font color="#FF9933" size="+2"><strong><em><a href="http://www.javasonics.com/" target="_top"> <font face="Verdana, Arial, Helvetica, sans-serif">JavaSonics</font></a></em> </strong></font>
+        </center></td>
+      <td width="60" bgcolor="#DCE2E7"><center>
+          <h1>SDK</h1>
+        </center></td>
+      <td bgcolor="#DCE2E7"><center>
+          <h1><!-- InstanceBeginEditable name="mainHeading" -->Documentation<!-- InstanceEndEditable --></h1>
+        </center></td>
+    </tr>
+  </table>
+</center>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td valign="top" width="100" bgcolor="#D7E5F2"><br>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/" target="_top">Web&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="../index.html" target="_top">SDK&nbsp;Home</a></p>
+      <p><a class="sidenavbar" href="index.html" target="_top">Docs</a></p>
+      <p><a class="sidenavbar" href="../php_test/index.html" target="_top">Test&nbsp;PHP</a></p>
+      <p><a class="sidenavbar" href="../asp_test/index.html" target="_top">Test&nbsp;ASP</a></p>
+      <p><a class="sidenavbar" href="../asp_net_test/index.html" target="_top">Test&nbsp;ASP.NET</a></p>
+      <p><a class="sidenavbar" href="../examples/index.html" target="_top">Examples</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/demos/" target="_top">Demos</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/downloads/" target="_top">Download</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/sales/" target="_top">Purchase</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/support/" target="_top">Support</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/forum/" target="_top">Forum</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/login/" target="_top">Login</a></p>
+      <p><a class="sidenavbar" href="http://www.javasonics.com/contacts.php" target="_top">Contact&nbsp;Us</a></p>
+      <p><a class="sidenavbar" href="http://www.mobileer.com/" target="_blank">Company</a></p>
+      <br>
+    </td>
+    <td valign="top"><div class="primary"> <!-- InstanceBeginEditable name="primaryContent" -->
+        <h2> Controlling the ListenUp Applet with JavaScript.</h2>
+        <p><font color="#000000">Some browsers, notably Internet Explorer and Netscape on Windows, allow JavaScript in a web page to communicate with a Java Applet.</font>
+        </p>
+        <p>One could, for example, hide the applet transport controls (the play, stop, and record buttons), and substitute simple JavaScript/HTML buttons instead.
+        <blockquote>
+          <h2> <a href="../examples/send_using_javascript.html" target="_blank">Click Here for an Example</a></h2>
+        </blockquote>
+        <h4> Setting up the &lt;applet> Tag</h4>
+        <p>To enable a Java applet to communicate with JavaScript, you <strong>must</strong> include the the following in the applet tag:
+        </p>
+        <blockquote>
+          <pre>mayscript="true&quot;</pre>
+        </blockquote>
+        <p>You must give the Applet a name in the Applet tag which can be used by JavaScript to refer to the Applet. For example:</p>
+        <pre>&nbsp;&nbsp;&nbsp; name="JavaSonicRecorderUploader"</pre>
+        <p>You can hide the applet's transport controls by passing it the tag:
+        </p>
+        <blockquote>
+          <pre>&lt;param name="showTransport" value="no"</pre>
+        </blockquote>
+        <h4>Calling the Applet from JavaScript</h4>
+        <p>To send a command to the applet from JavaScript, use the NAME given with the Applet tag. Call document.<i>appletName.methodName</i>(). For example, to start playback:
+        </p>
+        <blockquote>
+          <pre>document.JavaSonicRecorderUploader.play();</pre>
+        </blockquote>
+        <p>See the <a href="script_methods.html">complete list of the applet methods</a> that can be called from JavaScript.
+        </p>
+        <h4> Callbacks from Java to JavaScript</h4>
+        <p>To enable JavaScript to receive notification when the Recorder Applet starts, plays, records, etc, set the Applet's &quot;requestStateChanges&quot; parameter to &quot;yes&quot;. </p>
+        <blockquote>
+          <pre id="line187">&lt;param name="requestStateChanges" value="yes"&gt;  </pre>
+        </blockquote>
+        <p>ListenUp will then call a JavaScript function called &quot;LUPJS_StateChanged( previousState, newState )&quot; whenever the state changes. You define that function in JavaScript. This JavaScript function can enable or disable HTML buttons, etc depending on the state of the applet. For example, it can check if the player has stopped then you could disable your &quot;Stop&quot; button. For example:</p>
+        <blockquote>
+          <pre>function LUPJS_StateChanged( previousState, newState )<br>{<br>	if( newState == "stopped" ) doument.listenupControlForm.stopButton.disabled = true;<br>	else document.listenupControlForm.stopButton.disabled = false;<br>}
+       </pre>
+        </blockquote>
+        <h4>Knowing if the Applet is Ready</h4>
+        <p>You should tell the Applet to notify JavaScript when the Applet is ready to be called. This can prevent JavaScript from calling the Applet before it is loaded and ready. For example, we could have the Applet call a JavaScript function called "appletIsReady()" that enabled the HTML buttons. </p>
+        <blockquote>
+          <pre>&lt;param name="readyScript" value="appletIsReady();">
+</pre>
+        </blockquote>
+        <p>You can also call the isActive() method to check for Applet readyness.
+        <blockquote>
+          <pre>if( document.JavaSonicRecorderUploader.isActive() )</pre>
+        </blockquote>
+        <p>[<a href="index.html">Top</a>]&nbsp; [<a href="text_fields.html">Previous</a>] [<a href="ssl_authentication.html">Next</a>]<br>
+          &nbsp;</p>
+    <!-- InstanceEndEditable --> </div></td>
+  </tr>
+</table>
+<br>
+<div align="left"> &copy; 2001-2006 <a href="http://www.mobileer.com/">Mobileer, Inc.</a> &nbsp;&nbsp;This page is from the ListenUp&nbsp;SDK. You can download the SDK from <a href="http://www.javasonics.com/downloads/">here</a>.</div>
+</body>
+<!-- InstanceEnd --></html>
