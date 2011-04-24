@@ -8,7 +8,7 @@ import sys
 import random
 import os
 
-AUDIOFILE_DIR = os.path.dirname(__file__) + '/audio_files/'
+AUDIOFILE_DIR = os.path.join(os.path.dirname(__file__), 'audio_files')
 
 def hello_world(request):
     resp = HttpResponse(
@@ -37,13 +37,20 @@ def whatd_you_say(request):
     return resp
 
 def handle_upload(request):
-    resp = "SUCCESS"
+    resp = "CALLJS alert('Server says Yo.');\n"
+    resp += "CALLJS say_hi();\n"
+    resp += "SUCCESS"
     print("Received POST.")
-    print("Files in post: \n{0}".format(request.FILES.keys()))
+    print("Files in post: \n")
+    print(request.FILES.keys())
     filename, file = request.FILES.items()[0]
     rint = random.randint(1, sys.maxint)
-    new_filename = AUDIOFILE_DIR + '/uploaded_file_{}.wav'.format(rint)
-    destination = open(new_filename, 'wb+')
+    
+    new_filename = 'uploaded_file_' + str(rint) + '.wav'
+    new_fullpath = os.path.join(
+                       AUDIOFILE_DIR, new_filename
+                   )
+    destination = open(new_fullpath, 'wb+')
     for chunk in file.chunks():
         destination.write(chunk)
     destination.close()
@@ -52,15 +59,24 @@ def handle_upload(request):
 
 def handle_uploaded_file(up_file):
     print("Got it!")
-    ondisk_file = open(AUDIOFILE_DIR + '/upload.wav', "wb")
+    fullpath = os.path.join(AUDIOFILE_DIR, 'upload.wav')
+    ondisk_file = open(fullpath, "wb")
     ondisk_file.write(up_file.read())
-    ondisk_file.close()    
+    ondisk_file.close()
+
+def makefile(request, filename):
+    fullpath = os.path.join(AUDIOFILE_DIR, filename)
+    ondisk_file = open(fullpath, "wb")
+    ondisk_file.write(str(random.randint(0, 254)))
+    ondisk_file.close()
+    return HttpResponse(fullpath)
 
 #from django import forms
 #class UploadFileForm(forms.Form):
 #    title = forms.CharField(max_length=50)
 #    file  = forms.FileField()
 
+"""
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -77,4 +93,4 @@ def upload_file(request):
                               , {'form': form}
                               ,context_instance=RequestContext(request)
     )
-
+"""

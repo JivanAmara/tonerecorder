@@ -1,13 +1,28 @@
-<head></head>
+<head>
+	<script language="javascript" type="text/javascript" >
+		<!--
+		function refresh_page() {
+			setTimeout("location.reload(true);");
+		}
+
+		function say_hi() {
+			alert("It worked!!!");
+		}
+		// -->
+	</script>
+</head>
 
 <body><h1>Hello World!!!</h1>
+	<!-- 'mayscript' Needed for server to trigger call on successful upload -->
 	<applet 
 	    code="com.softsynth.javasonics.recplay.RecorderUploadApplet"
 	    codebase="/tonerecorder/codebase"
 	    archive="JavaSonicsListenUp.jar,OggXiphSpeexJS.jar"
 	    name="ListenUpRecorder"
+	    frameRate="44100"
 	    width="500"
-	    height="240">
+	    height="240"
+		mayscript="true" >
 	    {% csrf_token %}
 	
 	    <!-- URL for the script which receives the uploaded sound file. -->
