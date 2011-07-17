@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 import sys
 import random
@@ -31,11 +33,15 @@ def hello_world(request):
 
     return resp
 
+@login_required
 def whatd_you_say(request):
-    resp = render_to_response('record.html')
+    rc = RequestContext(request)
+    resp = render_to_response('record.html', rc)
 
     return resp
 
+@login_required
+@csrf_exempt
 def handle_upload(request):
     resp = "CALLJS alert('Server says Yo.');\n"
     resp += "CALLJS say_hi();\n"
