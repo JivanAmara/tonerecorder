@@ -27,7 +27,7 @@
 	    {% csrf_token %}
 	
 	    <!-- URL for the script which receives the uploaded sound file. -->
-	    <param name="uploadURL" value="{% url tonerecorder.views.handle_upload %}">
+	    <param name="uploadURL" value="{% url 'tonerecorder.views.handle_upload' %}">
 
 	    <!-- Name of uploaded sound file. Server can change it if needed. -->
 	    <param name="uploadFileName" value="whatever.wav">                    
