@@ -1,0 +1,24 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        body {
+            font-size: 200%; 
+        }
+    </style>
+</head>
+
+<body>
+    <p>Hi There, click below to start recording, then click 'Upload' to submit.</p>
+
+	<form action="{% url 'tonerecorder_upload-wav' %}" method="post" enctype="multipart/form-data">
+	   {% csrf_token %}
+	   <p>Tap to record -><input id="capture" type="file" name="audio" accept="audio/*" capture value="Record"></p>
+	   
+	   <p>When the recording is good, tap here to upload -><input id="submit" type="submit" value="Upload"></p>
+	</form>
+
+</body>
+
+</html>
