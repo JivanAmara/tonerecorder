@@ -10,13 +10,17 @@
 </head>
 
 <body>
-    <p>Hi There, click below to start recording, then click 'Upload' to submit.</p>
+    <p><a href="{% url 'logout' %}">Log Out</a></p>
 
-	<form action="{% url 'tonerecorder_upload-wav' %}" method="post" enctype="multipart/form-data">
+    <p>Hi There, click below to record, then click 'Upload' to submit.</p>
+    <p>Please record: {{syllable}}</p>
+
+	<form action="{% url 'tonerecorder_upload-audio' %}" method="post" enctype="multipart/form-data">
 	   {% csrf_token %}
-	   <p>Tap to record -><input id="capture" type="file" name="audio" accept="audio/*" capture value="Record"></p>
-	   
-	   <p>When the recording is good, tap here to upload -><input id="submit" type="submit" value="Upload"></p>
+       <input name="syllable" id="syllable" type="hidden" value="{{syllable}}">
+	   Tap to record -><input name="audio" id="capture" type="file" accept="audio/*" capture>
+	   When the recording is good, tap here to upload ->
+	   <input id="submit" type="submit" value="Upload">
 	</form>
 
 </body>

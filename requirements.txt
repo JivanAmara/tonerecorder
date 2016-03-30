@@ -1,0 +1,1 @@
+hanzi-basics==1.1.1
