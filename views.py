@@ -36,9 +36,7 @@ class AudioUploadView(View):
             resp = HttpResponseRedirect(request.META['HTTP_REFERER'])
         else:
             syllable_string = request.POST['syllable']
-            sound = syllable_string[:-1]
-            tone = syllable_string[-1]
-            syllable = PinyinSyllable.objects.get(sound=sound, tone=tone)
+            syllable = PinyinSyllable.objects.get(display=syllable_string)
             filetype, file = request.FILES.items()[0]
             assert(filetype == 'audio')
 
