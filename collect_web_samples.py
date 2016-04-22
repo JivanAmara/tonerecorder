@@ -83,7 +83,7 @@ if __name__ == "__main__":
         command = None
 
     sys.path.append(DIRPATH)
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'collect_samples_settings'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'script_settings'
     django.setup()
 
     if command == 'makefile':
