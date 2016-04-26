@@ -11,6 +11,7 @@ class RecordedSyllable(models.Model):
     user = models.ForeignKey(User)
     syllable = models.ForeignKey(PinyinSyllable)
     content = models.BinaryField()
+    content_as_wav = models.BinaryField(null=True)
     file_extension = models.CharField(max_length=40)
 
     def __unicode__(self):
