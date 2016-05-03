@@ -7,9 +7,11 @@ from __future__ import print_function
 
 import argparse
 import cStringIO
+import hashlib
 import os, sys
 import re
 import sndhdr
+from subprocess import Popen
 import subprocess
 from tempfile import NamedTemporaryFile
 from time import sleep
@@ -33,7 +35,7 @@ def whathdr_stringio(sio):
 sndhdr.whathdr_stringio = whathdr_stringio
 
 def convert_wav_all(remove_files=True):
-    print('Process {} remove files.'.format('will' if remove_files else 'will not'))
+    print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
     nrecs = RecordedSyllable.objects.count()
     print('Converting {} Samples'.format(nrecs))
 
@@ -80,6 +82,41 @@ def convert_wav_all(remove_files=True):
         rs.save()
         print('.', end='')
         sys.stdout.flush()
+
+def normalize_volume_all(remove_files=True):
+    print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
+    nrecs = RecordedSyllable.objects.count()
+    print('Normalizing Volume for {} Samples'.format(nrecs))
+
+    for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
+        if not rs.content_as_wav:
+            print('x', end='')
+            sys.stdout.flush()
+            continue
+        rs.content_as_normalized_wav = None
+
+        wavfile = NamedTemporaryFile(delete=False)
+        hash1 = hashlib.sha224(rs.content_as_wav).hexdigest()
+        wavfile.write(rs.content_as_wav)
+        wavfile.close()
+
+        p = Popen(['normalize-audio', '-q', wavfile.name])
+        if p.wait() != 0:
+            print('x', end='')
+            sys.stdout.flush()
+            continue
+
+        with open(wavfile.name) as f:
+            rs.content_as_normalized_wav = f.read()
+            rs.save()
+        os.unlink(wavfile.name)
+        hash2 = hashlib.sha224(rs.content_as_normalized_wav).hexdigest()
+        if hash1 == hash2:
+            print('-', end='')
+        else:
+            print('.', end='')
+            sys.stdout.flush()
+    print()
 
 def analyze_all():
     nrecs = RecordedSyllable.objects.count()
@@ -134,6 +171,9 @@ if __name__ == '__main__':
         help='Use this flag to keep the before & after audio files from the conversion process'
     )
 
+    normalize_parser = subparsers.add_parser('normalize', help='Normalize the audio volume for all samples')
+    normalize_parser.set_defaults(subcommand='normalize')
+
     args = parser.parse_args()
 
     sys.path.append(DIRPATH)
@@ -148,5 +188,7 @@ if __name__ == '__main__':
         analyze_all()
     if args.subcommand == 'makewav':
         convert_wav_all(remove_files=not args.keep_files)
+    if args.subcommand == 'normalize':
+        normalize_volume_all()
     else:
         raise Exception('Unexpected subcommand {}'.format(args.subcommand))
