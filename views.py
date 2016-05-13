@@ -26,8 +26,9 @@ class MobileRecordView(View):
     def get(self, request):
         """ | *note*: Presumes an authenticated user, decorate with 'login_required'.
         """
-        syllable = get_unrecorded_syllable(request.user)
-        resp = render(request, 'record-html5-mobile.html', context={'syllable': syllable})
+        syllable, rank = get_unrecorded_syllable(request.user)
+        context = {'syllable': syllable, 'syllable_rank': rank}
+        resp = render(request, 'record-html5-mobile.html', context=context)
         return resp
 
 class AudioUploadView(View):
@@ -57,21 +58,22 @@ class AudioUploadView(View):
 
 
 def get_unrecorded_syllable(user):
-    """ @brief Returns the pinyin of a sound this user hasn't yet recorded.
+    """ @brief Returns the pinyin of a sound this user hasn't yet recorded, along with the
+            priority of the syllable.
     """
     rss = RecordedSyllable.objects.filter(user=user)
     already_recorded = [ rs.syllable for rs in rss ]
 
     prioritized_sounds = \
         PinyinSyllable.objects\
-               .values('sound')\
+               .values('sound', 'tone')\
                .annotate(total_use_count=Sum('hanzis__use_count'))\
                .order_by('-total_use_count')
 
     # Cycle through the highest priority sounds, then through the syllables for
     #    each sound checking for the first which hasn't been recorded.
     next_to_record = None
-    for prioritized_sound in prioritized_sounds:
+    for i, prioritized_sound in enumerate(prioritized_sounds, 0):
         if next_to_record: break
         pinyin_syllables = \
             PinyinSyllable.objects\
@@ -82,4 +84,4 @@ def get_unrecorded_syllable(user):
                 next_to_record = ps
                 break
 
-    return next_to_record.display
+    return (next_to_record.display, i)

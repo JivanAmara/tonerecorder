@@ -12,7 +12,10 @@ class RecordedSyllable(models.Model):
     syllable = models.ForeignKey(PinyinSyllable)
     content = models.BinaryField()
     content_as_wav = models.BinaryField(null=True)
+    # Normalized Volume
     content_as_normalized_wav = models.BinaryField(null=True)
+    # Silence Stripped version of content_as_normalized_wav
+    content_as_silence_stripped_wav = models.BinaryField(null=True)
     file_extension = models.CharField(max_length=40)
 
     def __unicode__(self):

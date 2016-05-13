@@ -16,6 +16,8 @@ import subprocess
 from tempfile import NamedTemporaryFile
 from time import sleep
 from uuid import uuid1
+import scipy.io.wavfile
+import numpy
 
 import django
 from django.core.files.temp import NamedTemporaryFile
@@ -60,6 +62,7 @@ def convert_wav_all(remove_files=True):
             with NamedTemporaryFile(prefix='{}{}_'.format(rs.syllable.sound, rs.syllable.tone),
                     suffix='.{}'.format(extension), delete=remove_files) as ntf:
                 ntf.write(rs.content)
+                ntf.seek(0)
                 uuid = uuid1()
                 wavfilename = '/tmp/{}.wav'.format(uuid)
 
@@ -70,10 +73,9 @@ def convert_wav_all(remove_files=True):
                     '-ac', '1', '-ar', '44100', wavfilename
                 ]
                 with open(os.devnull) as nullfile:
-                    error = subprocess.call(cmd, stdout=nullfile, stderr=nullfile)
-                if error:
-                    print('\nproblem with: {}'.format(ntf.name))
-                    sys.stdout.flush()
+                    retcode = subprocess.call(cmd, stdout=nullfile, stderr=nullfile)
+                if retcode:
+                    print('\nretcode {} for:\n{}'.format(retcode, ' '.join(cmd)))
                     continue
                 with open(wavfilename) as wavfile:
                     rs.content_as_wav = wavfile.read()
@@ -88,7 +90,16 @@ def normalize_volume_all(remove_files=True):
     nrecs = RecordedSyllable.objects.count()
     print('Normalizing Volume for {} Samples'.format(nrecs))
 
+    print('. Making normalized version')
+    print('o Normalized version already exists')
+    print('- Normalized version matches original')
+    print('x No wav content to normalize')
     for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
+        if rs.content_as_normalized_wav:
+            print('o', end='')
+            sys.stdout.flush()
+            continue
+
         if not rs.content_as_wav:
             print('x', end='')
             sys.stdout.flush()
@@ -153,6 +164,88 @@ def get_metadata(rs):
 
     return audio_metadata
 
+def strip_silence_all(recalculate=False):
+    ''' Copies RecordedSyllable.content_as_normalized_wav to
+            RecordedSyllable.content_as_silence_stripped_wav with preceding & trailing silence
+            removed.
+    '''
+    rs_count = RecordedSyllable.objects.count()
+    print('Stripping silence from {} RecordedSyllable objects'.format(rs_count))
+    print('. Stripped silence')
+    print('o Silence already stripped, ignoring')
+    print('x Error reading RecordedSyllable.content_as_normalized_wav')
+    for rs in RecordedSyllable.objects.all():
+        if recalculate:
+            rs.content_as_silence_stripped_wav = None
+
+        if rs.content_as_silence_stripped_wav is not None:
+            print('o', end='')
+            sys.stdout.flush()
+            continue
+
+        if rs.content_as_normalized_wav is None:
+            print('x', end='')
+            sys.stdout.flush()
+            continue
+
+        sio_in = cStringIO.StringIO(rs.content_as_normalized_wav)
+        stripped_content = strip_silence(sio_in)
+        sio_in.close()
+        if stripped_content is None:
+            print('x', end='')
+            sys.stdout.flush()
+            continue
+
+        sio_out = cStringIO.StringIO()
+        scipy.io.wavfile.write(sio_out, 44100, stripped_content)
+        rs.content_as_silence_stripped_wav = sio_out.getvalue()
+        sio_out.close()
+        rs.save()
+        print('.', end='')
+        sys.stdout.flush()
+    print()
+
+def strip_silence(wave_file, show_graph=False):
+    ''' Removes low-volume data from the beginning and end of *wave_data*.
+    '''
+    try:
+        sample_rate, wave_data = scipy.io.wavfile.read(wave_file)
+    except ValueError as ex:
+        if ex.message == "Unknown wave file format":
+            return None
+    if show_graph:
+        from matplotlib import pyplot as plt
+        x = numpy.arange(len(wave_data))
+        plt.subplot(211)
+        plt.plot(x, wave_data)
+        plt.subplot(212)
+
+    # make 10ms chunk size
+    chunk_size = int(44100.0 * 0.010)
+#     print('Chunk size for 10ms: {}'.format(chunk_size))
+    signal_start = 0  # Index where silence ends and signal starts
+    silence_threshold = 800
+    volume_found = 0
+    while volume_found < silence_threshold and signal_start < (len(wave_data) - chunk_size):
+        chunk = wave_data[signal_start:signal_start + chunk_size]
+        volume_found = numpy.mean(abs(chunk))
+        signal_start += chunk_size
+
+    volume_found = 0
+    signal_end = len(wave_data)
+    while volume_found < silence_threshold and signal_end >= chunk_size:
+        chunk = wave_data[signal_end - chunk_size:signal_end]
+        volume_found = numpy.mean(abs(chunk))
+        signal_end -= chunk_size
+
+    stripped_wave_data = wave_data[signal_start:signal_end]
+    if show_graph:
+        x = numpy.arange(len(stripped_wave_data))
+        plt.plot(x, stripped_wave_data)
+        plt.show()
+
+    return stripped_wave_data
+
 # Full path to the directory containing this file.
 DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
 
@@ -174,6 +267,17 @@ if __name__ == '__main__':
     normalize_parser = subparsers.add_parser('normalize', help='Normalize the audio volume for all samples')
     normalize_parser.set_defaults(subcommand='normalize')
 
+    stripsilence_parser = subparsers.add_parser('stripsilence', help='Remove preceding/following silence for all samples')
+    stripsilence_parser.set_defaults(subcommand='stripsilence')
+    stripsilence_parser.add_argument('--recalc', dest='recalc', default=False,
+        action='store_true',
+        help='If content with silence stripped exists, remove and recalculate'
+    )
+
+    stripsilence1_parser = subparsers.add_parser('stripsilence1', help='Remove preceding/following silence for all samples')
+    stripsilence1_parser.set_defaults(subcommand='stripsilence1')
+    stripsilence1_parser.add_argument('id')
+
     args = parser.parse_args()
 
     sys.path.append(DIRPATH)
@@ -186,9 +290,26 @@ if __name__ == '__main__':
 
     if args.subcommand == 'analyze':
         analyze_all()
-    if args.subcommand == 'makewav':
+    elif args.subcommand == 'makewav':
         convert_wav_all(remove_files=not args.keep_files)
-    if args.subcommand == 'normalize':
+    elif args.subcommand == 'normalize':
         normalize_volume_all()
+    elif args.subcommand == 'stripsilence':
+        strip_silence_all(recalculate=args.recalc)
+    elif args.subcommand == 'stripsilence1':
+        rs = RecordedSyllable.objects.get(id=args.id)
+        print('len(content_as_normalized_wav): {}'.format(len(rs.content_as_normalized_wav)))
+        sio_in = cStringIO.StringIO(rs.content_as_normalized_wav)
+        stripped_content = strip_silence(sio_in, show_graph=True)
+        sio_in.close()
+        print('len(stripped_content): {}'.format(len(stripped_content)))
+        sio_out = cStringIO.StringIO()
+        scipy.io.wavfile.write(sio_out, 44100, stripped_content)
+        out_wav_content = sio_out.getvalue()
+        sio_out.close()
+
+        with open('stripped.wav', 'w+') as of:
+            of.write(out_wav_content)
+        print('Wrote "stripped.wav"')
     else:
         raise Exception('Unexpected subcommand {}'.format(args.subcommand))
