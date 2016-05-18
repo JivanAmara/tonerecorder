@@ -5,9 +5,9 @@ Created on Apr 21, 2016
 '''
 from __future__ import print_function
 
-from _ast import Raise
 import argparse
 import errno
+import hashlib
 import os, sys
 import re
 
@@ -72,10 +72,16 @@ def dump_all(dirpath):
     """ Dumps all RecordedSyllables to files in *dirpath*.
         Naming convention is '<speaker-name>--0--<sound>--<tone>--0.<extension>'
     """
-    os.makedirs(dirpath)
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+
     nrecs = RecordedSyllable.objects.count()
     print('Dumping {} Samples'.format(nrecs))
-
+    print('. Dumping content without archive file')
+    print('! Will re-dump content because archive file doesn\'t match content')
+    print('o Archive file exists and matches content')
+    print('x No content for recorded syllable')
+    missing_content = []
     for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
         try:
             os.makedirs(os.path.join(dirpath, rs.user.username))
@@ -83,10 +89,44 @@ def dump_all(dirpath):
             if exception.errno != errno.EEXIST:
                 raise
         fname = os.path.join(rs.user.username, content_filename(rs))
-        with open(os.path.join(dirpath, fname), 'w+') as f:
-            f.write(rs.content)
-        print('.', end='')
+        fpath = os.path.join(dirpath, fname)
+
+        if not rs.content:
+            print('x', end='')
+            sys.stdout.flush()
+            rs_desc = '{}: {}{} (id: {})'.format(
+                          rs.user.username, rs.syllable.sound, rs.syllable.tone, rs.id
+                      )
+            missing_content.append(rs_desc)
+            continue
+
+        # Check that an existing dump matches the current db content
+        if os.path.exists(fpath):
+            with open(fpath, 'rb') as f:
+                file_hash = hashlib.md5()
+                file_hash.update(f.read())
+            content_hash = hashlib.md5()
+            content_hash.update(rs.content)
+            if file_hash.digest() == content_hash.digest():
+                dump_content = False
+                print('o', end='')
+                sys.stdout.flush()
+            else:
+                print('!', end='')
+                dump_content = True
+                sys.stdout.flush()
+        else:
+            dump_content = True
+
+        # If there's no existing dump, or the content doesn't match the dump, dump to file.
+        if dump_content:
+            with open(fpath, 'wb') as f:
+                f.write(rs.content)
+            print('.', end='')
+            sys.stdout.flush()
     print()
+    if missing_content:
+        print('Missing .content for files:\n{}'.format('\n'.join(missing_content)))
 
 def dump_wav(rs):
     """ Dumps a .wav file from the content_as_wav field of the RecordedSyllable passed.
@@ -94,7 +134,7 @@ def dump_wav(rs):
         See content_as_wav_filename() for file naming convention.
     """
     fname = content_as_wav_filename(rs)
-    with open(fname, 'w+') as wavfile:
+    with open(fname, 'wb') as wavfile:
         wavfile.write(rs.content_as_wav)
     return fname
 
@@ -116,8 +156,9 @@ if __name__ == '__main__':
     )
     dump_parser.set_defaults(subcommand='dump')
     dump_parser.add_argument(
-        'directory', type=str, help='Directory to dump audio files to'
+        '-d', '--directory', type=str, help='Directory to dump audio files to'
     )
+    dump_parser.set_defaults(directory=os.path.join(DIRPATH, 'sample_archive'))
     dumpwav_parser.set_defaults(subcommand='dumpwav')
     dumpwav_parser.add_argument(
         'rsid', type=int, help='Id of the RecordedSyllable to dump as .wav'
@@ -126,7 +167,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     sys.path.append(DIRPATH)
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'script_settings'
+    if not os.environ.get('DJANGO_SETTINGS_MODULE'):
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'script_settings'
     django.setup()
 
     from hanzi_basics.models import PinyinSyllable
