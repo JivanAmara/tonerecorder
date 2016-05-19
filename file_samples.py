@@ -19,7 +19,7 @@ def file_metadata(filepath):
         Keys are: 'speaker_name', 'sound', 'tone', 'extension'.
     '''
     filename = os.path.split(filepath)[1]
-    metadata_regex = '(?P<speaker_name>\w+)--\d--(?P<sound>\w+)--(?P<tone>\d)--\d.(?P<extension>.*)$'
+    metadata_regex = '(?P<speaker_name>[\w\.]+)--\d--(?P<sound>\w+)--(?P<tone>\d)--\d.(?P<extension>.*)$'
     result = re.match(metadata_regex, filename)
 
     if result:
@@ -31,8 +31,12 @@ def file_metadata(filepath):
 
     return metadata
 
-def load_file(filename):
-    md = file_metadata(filename)
+def load_file(filepath):
+    ''' Loads the contents of *filepath* into the database.  See file_metadata() for details of
+            expected filepath format.
+        Returns None on success and a string describing the problem on failure.
+    '''
+    md = file_metadata(filepath)
     if not md:
         return 'could not load metadata'
 
@@ -42,15 +46,76 @@ def load_file(filename):
     except PinyinSyllable.DoesNotExist:
         return 'not a real syllable, skipping'
 
-    with open(filename) as f:
-        content = f.read()
-    rs = RecordedSyllable(
-        user=user, syllable=syllable, content=content, file_extension=md['extension']
-    )
     try:
+        rs = RecordedSyllable.objects.get(
+                         user=user, syllable__sound=md['sound'], syllable__tone=md['tone'])
+    except RecordedSyllable.DoesNotExist:
+        rs = None
+
+    with open(filepath) as f:
+        content = f.read()
+
+    # If an existing entry in the database exists, check that it matches the contents of
+    #    the file.
+    if rs:
+        rs_hash = hashlib.md5()
+        content_hash = hashlib.md5()
+        rs_hash.update(rs.content)
+        content_hash.update(content)
+        if rs_hash.hexdigest() != content_hash.hexdigest():
+            # if the file doesn't match the database content, save the database content
+            #    using the filepath with '.db-version' before the extension
+            db_filepath = re.sub(r'(.*)\.(.*)', r'\1.db-version.\2', filepath)
+            with open(db_filepath, 'wb') as db_file:
+                db_file.write(rs.content)
+            ret = 'db file mismatch'
+        else:
+            ret = 'already loaded'
+    else:
+        rs = RecordedSyllable(
+            user=user, syllable=syllable, content=content, file_extension=md['extension']
+        )
         rs.save()
-    except django.db.IntegrityError:
-        return 'already loaded'
+        ret = None
+
+    return ret
+
+
+def load_all(sample_archive_directory):
+    if not os.path.exists(sample_archive_directory):
+        raise Exception('Sample Directory "{}" doen\'t exist'.format(sample_archive_directory))
+
+    print('Loading all samples from {} into database.'.format(sample_archive_directory))
+    print('. Sample loaded successfully')
+    print('- Sample already exists in database')
+    print('x Error loading sample')
+    print('m Sample exists in database but doesn\'t match file (See .db-version. files)')
+    print('s Sample is for a non-existent pinyin syllable, skipping')
+    file_count = 0
+    for root, dirs, filenames in os.walk(sample_archive_directory):
+        for filename in filenames:
+            if 'db-version' in filename:
+                raise Exception('Mismatch dubugging file found in archive: {}'.format(filename))
+            filepath = os.path.join(root, filename)
+            error = load_file(filepath)
+
+            if error == 'already loaded':
+                print('-', end='')
+            elif error is None:
+                print('.', end='')
+            elif error == 'could not load metadata':
+                print('x', end='')
+            elif error == 'not a real syllable, skipping':
+                print('s', end='')
+            elif error == 'db file mismatch':
+                print('m', end='')
+            else:
+                raise Exception('Unexpected return value for load_file(): {}'.format(error))
+            sys.stdout.flush()
+
+            file_count += 1
+    print()
+    print('{} sample files loaded'.format(file_count))
 
 def content_filename(rs):
     """ Returns a filename for the content field of the RecordedSyllable passed.
@@ -152,8 +217,9 @@ if __name__ == '__main__':
 
     load_parser.set_defaults(subcommand='load')
     load_parser.add_argument(
-        'directory', type=str, help='Directory to load audio files from'
+        '-d', '--directory', type=str, help='Directory to load audio files from'
     )
+    load_parser.set_defaults(directory=os.path.join(DIRPATH, 'sample_archive'))
     dump_parser.set_defaults(subcommand='dump')
     dump_parser.add_argument(
         '-d', '--directory', type=str, help='Directory to dump audio files to'
@@ -177,16 +243,7 @@ if __name__ == '__main__':
 
 
     if args.subcommand == 'load':
-        print('Collecting files from {}'.format(args.directory))
-        for dirpath, dirnames, filenames in os.walk(args.directory):
-            for filename in filenames:
-                filepath = os.path.join(dirpath, filename)
-                print('loading {}...'.format(filepath), end='')
-                error = load_file(filepath)
-                if error:
-                    print(error)
-                else:
-                    print('done.')
+        load_all(args.directory)
     elif args.subcommand == 'dump':
         dump_all(args.directory)
     elif args.subcommand == 'dumpwav':
