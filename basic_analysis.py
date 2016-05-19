@@ -84,6 +84,7 @@ def convert_wav_all(remove_files=True):
         rs.save()
         print('.', end='')
         sys.stdout.flush()
+    print()
 
 def normalize_volume_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
