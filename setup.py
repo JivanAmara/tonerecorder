@@ -10,7 +10,7 @@ with open('README.rst', 'r') as rmf:
 
 setup(
     name="tonerecorder",
-    version="0.1.1.dev18",
+    version="0.1.2",
     author="Jivan Amara",
     author_email="Development@JivanAmara.net",
     packages=['tonerecorder', 'tonerecorder.migrations',
