@@ -36,6 +36,10 @@ def load_file(filepath):
             expected filepath format.
         Returns None on success and a string describing the problem on failure.
     '''
+    from django.contrib.auth.models import User
+    from hanzi_basics.models import PinyinSyllable
+    from tonerecorder.models import RecordedSyllable
+
     md = file_metadata(filepath)
     if not md:
         return 'could not load metadata'

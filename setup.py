@@ -10,10 +10,11 @@ with open('README.rst', 'r') as rmf:
 
 setup(
     name="tonerecorder",
-    version="0.1.1",
+    version="0.1.1.dev18",
     author="Jivan Amara",
     author_email="Development@JivanAmara.net",
-    packages=['tonerecorder', 'tonerecorder.migrations'],
+    packages=['tonerecorder', 'tonerecorder.migrations',
+              'tonerecorder.management', 'tonerecorder.management.commands'],
     package_data={
         'tonerecorder': [
             'requirements.txt',

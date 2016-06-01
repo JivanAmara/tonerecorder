@@ -18,9 +18,21 @@ from django.views.generic import View
 
 from hanzi_basics.models import PinyinSyllable
 from tonerecorder.models import RecordedSyllable
-
+from tonerecorder.file_samples import content_filename
+from tempfile import NamedTemporaryFile
 
 AUDIOFILE_DIR = os.path.join(os.path.dirname(__file__), 'audio_files')
+
+class AudioListenView(View):
+    def get(self, request, rs_id):
+        """ | *brief*: Returns a file-like response with the original content of the
+            |    RecordedSyllable referenced by *rs_id*.
+        """
+        rs = RecordedSyllable.objects.get(id=rs_id)
+        fname = content_filename(rs)
+        r = HttpResponse(rs.content, content_type='audio')
+        r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
+        return r
 
 class MobileRecordView(View):
     def get(self, request):
