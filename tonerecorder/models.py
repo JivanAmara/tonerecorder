@@ -22,6 +22,8 @@ class RecordedSyllable(models.Model):
     # Silence Stripped version of content_as_normalized_wav
     content_as_silence_stripped_wav = models.BinaryField(null=True)
     file_extension = models.CharField(max_length=40)
+    # This text is used to determine if normalization should be redone.
+    normalize_version = models.CharField(max_length=10)
 
     def __str__(self):
         u_syl = "{}".format(self.syllable)

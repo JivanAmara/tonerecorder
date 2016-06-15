@@ -20,10 +20,20 @@ import scipy.io.wavfile
 import numpy
 
 import django
-from django.core.files.temp import NamedTemporaryFile
 import mutagen.mp3
 import taglib
 
+from tonerecorder.models import RecordedSyllable
+
+NORMALIZE_VERSION = '0.1'
+
+def normalize_all():
+    print('Converting original audio to standardized wav.')
+    convert_wav_all()
+    print('Normalizing volume of wav.')
+    normalize_volume_all()
+    print('Stripping silence from wav.')
+    strip_silence_all()
 
 # --- Hack sndhdr to accept StringIO objects
 def whathdr_stringio(sio):
@@ -36,13 +46,14 @@ def whathdr_stringio(sio):
     return None
 sndhdr.whathdr_stringio = whathdr_stringio
 
+
 def convert_wav_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
     nrecs = RecordedSyllable.objects.count()
     print('Converting {} Samples'.format(nrecs))
 
     for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
-        if rs.content_as_wav:
+        if rs.content_as_wav and rs.normalize_version == NORMALIZE_VERSION:
             print('o', end='')
             sys.stdout.flush()
             continue
@@ -81,6 +92,7 @@ def convert_wav_all(remove_files=True):
                     rs.content_as_wav = wavfile.read()
                 if remove_files:
                     os.unlink(wavfilename)
+        rs.normalize_version = NORMALIZE_VERSION
         rs.save()
         print('.', end='')
         sys.stdout.flush()
@@ -96,7 +108,7 @@ def normalize_volume_all(remove_files=True):
     print('- Normalized version matches original')
     print('x No wav content to normalize')
     for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
-        if rs.content_as_normalized_wav:
+        if rs.content_as_normalized_wav and rs.normalize_version == NORMALIZE_VERSION:
             print('o', end='')
             sys.stdout.flush()
             continue
@@ -120,6 +132,7 @@ def normalize_volume_all(remove_files=True):
 
         with open(wavfile.name) as f:
             rs.content_as_normalized_wav = f.read()
+            rs.normalize_version = NORMALIZE_VERSION
             rs.save()
         os.unlink(wavfile.name)
         hash2 = hashlib.sha224(rs.content_as_normalized_wav).hexdigest()
@@ -179,7 +192,7 @@ def strip_silence_all(recalculate=False):
         if recalculate:
             rs.content_as_silence_stripped_wav = None
 
-        if rs.content_as_silence_stripped_wav is not None:
+        if rs.content_as_silence_stripped_wav and rs.normalize_version == NORMALIZE_VERSION:
             print('o', end='')
             sys.stdout.flush()
             continue
@@ -201,6 +214,7 @@ def strip_silence_all(recalculate=False):
         scipy.io.wavfile.write(sio_out, 44100, stripped_content)
         rs.content_as_silence_stripped_wav = sio_out.getvalue()
         sio_out.close()
+        rs.normalize_version = NORMALIZE_VERSION
         rs.save()
         print('.', end='')
         sys.stdout.flush()
@@ -265,8 +279,8 @@ if __name__ == '__main__':
         help='Use this flag to keep the before & after audio files from the conversion process'
     )
 
-    normalize_parser = subparsers.add_parser('normalize', help='Normalize the audio volume for all samples')
-    normalize_parser.set_defaults(subcommand='normalize')
+    normalize_volume_parser = subparsers.add_parser('normalize_volume', help='Normalize the audio volume for all samples')
+    normalize_volume_parser.set_defaults(subcommand='normalize_volume')
 
     stripsilence_parser = subparsers.add_parser('stripsilence', help='Remove preceding/following silence for all samples')
     stripsilence_parser.set_defaults(subcommand='stripsilence')
@@ -278,6 +292,9 @@ if __name__ == '__main__':
     stripsilence1_parser = subparsers.add_parser('stripsilence1', help='Remove preceding/following silence for all samples')
     stripsilence1_parser.set_defaults(subcommand='stripsilence1')
     stripsilence1_parser.add_argument('id')
+
+    normalize_parser = subparsers.add_parser('normalize', help='Execute all of the normalization procedures for all samples')
+    normalize_parser.set_defaults(subcommand='normalize')
 
     args = parser.parse_args()
 
@@ -293,7 +310,7 @@ if __name__ == '__main__':
         analyze_all()
     elif args.subcommand == 'makewav':
         convert_wav_all(remove_files=not args.keep_files)
-    elif args.subcommand == 'normalize':
+    elif args.subcommand == 'normalize_volume':
         normalize_volume_all()
     elif args.subcommand == 'stripsilence':
         strip_silence_all(recalculate=args.recalc)
@@ -312,5 +329,7 @@ if __name__ == '__main__':
         with open('stripped.wav', 'w+') as of:
             of.write(out_wav_content)
         print('Wrote "stripped.wav"')
+    elif args.subcommand == 'normalize':
+        normalize_all()
     else:
         raise Exception('Unexpected subcommand {}'.format(args.subcommand))
