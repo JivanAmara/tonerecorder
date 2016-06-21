@@ -28,23 +28,26 @@ class AudioListenView(View):
         """ | *brief*: Returns a file-like response with the original content of the
             |    RecordedSyllable referenced by *rs_id*.
         """
-        if request.user_agent.is_mobile:
-            rs = RecordedSyllable.objects.get(id=rs_id)
-            fname = content_filename(rs)
-            r = HttpResponse(rs.content, content_type='audio')
-            r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
-        else:
-            r = HttpResponse('Please visit this page with a smartphone, a desktop browser'\
-                             ' will not function properly.')
+        rs = RecordedSyllable.objects.get(id=rs_id)
+        fname = content_filename(rs)
+        r = HttpResponse(rs.content, content_type='audio')
+        r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
         return r
 
 class MobileRecordView(View):
     def get(self, request):
         """ | *note*: Presumes an authenticated user, decorate with 'login_required'.
         """
-        syllable, rank = get_unrecorded_syllable(request.user)
-        context = {'syllable': syllable, 'syllable_rank': rank}
-        resp = render(request, 'record-html5-mobile.html', context=context)
+        if not request.user_agent.is_mobile:
+            resp = HttpResponse('Please visit this page with a smartphone, a desktop browser'\
+                             ' will not function properly.')
+        else:
+            syllable, rank = get_unrecorded_syllable(request.user)
+            if rank > 200:
+                resp = HttpResponse("You've recorded enough, thank you.")
+            else:
+                context = {'syllable': syllable, 'syllable_rank': rank}
+                resp = render(request, 'record-html5-mobile.html', context=context)
         return resp
 
 class AudioUploadView(View):
