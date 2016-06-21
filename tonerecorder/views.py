@@ -28,10 +28,14 @@ class AudioListenView(View):
         """ | *brief*: Returns a file-like response with the original content of the
             |    RecordedSyllable referenced by *rs_id*.
         """
-        rs = RecordedSyllable.objects.get(id=rs_id)
-        fname = content_filename(rs)
-        r = HttpResponse(rs.content, content_type='audio')
-        r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
+        if request.user_agent.is_mobile:
+            rs = RecordedSyllable.objects.get(id=rs_id)
+            fname = content_filename(rs)
+            r = HttpResponse(rs.content, content_type='audio')
+            r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
+        else:
+            r = HttpResponse('Please visit this page with a smartphone, a desktop browser'\
+                             ' will not function properly.')
         return r
 
 class MobileRecordView(View):

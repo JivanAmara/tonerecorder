@@ -1,1 +1,2 @@
 git+ssh://obal/opt/gitrepos/hanzi_basics@v1.1.1#egg=hanzi-basics==1.1.1
+django-user-agents==0.3.0
