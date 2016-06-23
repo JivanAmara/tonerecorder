@@ -31,7 +31,7 @@ class AudioListenView(View):
         rs = RecordedSyllable.objects.get(id=rs_id)
         fname = content_filename(rs)
         r = HttpResponse(rs.content, content_type='audio')
-        r['Content-Disposition'] = 'attachment; filename="{}.txt"'.format(fname)
+        r['Content-Disposition'] = 'attachment; filename="{}"'.format(fname)
         return r
 
 class MobileRecordView(View):
