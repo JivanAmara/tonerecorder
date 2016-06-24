@@ -13,7 +13,7 @@
     <p><a href="{% url 'logout' %}">Log Out</a></p>
 
     <p>Hi There, click below to record, then click 'Upload' to submit.</p>
-    <p>Please record: ({{syllable_rank}}) {{syllable}}</p>
+    <p>Please record {{recorded_count}}/200: ({{syllable_rank}}) {{syllable}}</p>
 
 	<form action="{% url 'tonerecorder_upload-audio' %}" method="post" enctype="multipart/form-data">
 	   {% csrf_token %}

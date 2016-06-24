@@ -43,10 +43,15 @@ class MobileRecordView(View):
                              ' will not function properly.')
         else:
             syllable, rank = get_unrecorded_syllable(request.user)
-            if rank > 200:
+            recorded_count = RecordedSyllable.objects.filter(user=request.user).count()
+            if recorded_count >= 200:
                 resp = HttpResponse("You've recorded enough, thank you.")
             else:
-                context = {'syllable': syllable, 'syllable_rank': rank}
+                context = {
+                    'syllable': syllable.display,
+                    'syllable_rank': rank,
+                    'recorded_count': recorded_count
+                }
                 resp = render(request, 'record-html5-mobile.html', context=context)
         return resp
 
@@ -76,6 +81,23 @@ class AudioUploadView(View):
         return resp
 
 
+def syllable_priorities_by_id():
+    """ Returns a dictionary keying a pinyin sound-tone string (like 'ni3') to an integer
+            rank, with 1 as the highest rank.  The ranks are based on usage data for
+            hanzis with this pronunciation.
+    """
+    prioritized_syllables = \
+        PinyinSyllable.objects\
+               .values('sound', 'tone', 'id')\
+               .annotate(total_use_count=Sum('hanzis__use_count'))\
+               .order_by('-total_use_count')
+
+    priority_lookup = {}
+    for i, ps in enumerate(prioritized_syllables, 1):
+        priority_lookup[ps['id']] = i
+
+    return priority_lookup
+
 def get_unrecorded_syllable(user):
     """ @brief Returns the pinyin of a sound this user hasn't yet recorded, along with the
             priority of the syllable.
@@ -83,24 +105,21 @@ def get_unrecorded_syllable(user):
     rss = RecordedSyllable.objects.filter(user=user)
     already_recorded = [ rs.syllable for rs in rss ]
 
-    prioritized_sounds = \
+    priorities = syllable_priorities_by_id()
+
+    prioritized_syllables = \
         PinyinSyllable.objects\
-               .values('sound', 'tone')\
                .annotate(total_use_count=Sum('hanzis__use_count'))\
                .order_by('-total_use_count')
 
     # Cycle through the highest priority sounds, then through the syllables for
     #    each sound checking for the first which hasn't been recorded.
     next_to_record = None
-    for i, prioritized_sound in enumerate(prioritized_sounds, 0):
-        if next_to_record: break
-        pinyin_syllables = \
-            PinyinSyllable.objects\
-                .filter(sound=prioritized_sound['sound'])\
-                .order_by('tone')
-        for ps in pinyin_syllables:
-            if ps not in already_recorded:
-                next_to_record = ps
-                break
+    for i, prioritized_syllable in enumerate(prioritized_syllables, 1):
+        if priorities[prioritized_syllable.id] != i:
+            print('Priority mismatch! {} != {}'.format(priorities[prioritized_syllable.id], i))
+        if prioritized_syllable not in already_recorded:
+            next_to_record = prioritized_syllable
+            break
 
-    return (next_to_record.display, i)
+    return (next_to_record, i)
