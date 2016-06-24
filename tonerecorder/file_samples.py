@@ -141,12 +141,13 @@ def dump_all(dirpath):
     """ Dumps all RecordedSyllables to files in *dirpath*.
         Naming convention is '<speaker-name>--0--<sound>--<tone>--0.<extension>'
     """
+    from tonerecorder.models import RecordedSyllable
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
     nrecs = RecordedSyllable.objects.count()
-    print('Dumping {} Samples'.format(nrecs))
-    print('. Dumping content without archive file')
+    print('Dumping {} Samples to directory "{}"'.format(nrecs, dirpath))
+    print('. Dumping content not in archive')
     print('! Will re-dump content because archive file doesn\'t match content')
     print('o Archive file exists and matches content')
     print('x No content for recorded syllable')

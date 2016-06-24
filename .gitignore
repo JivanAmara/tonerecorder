@@ -4,3 +4,4 @@
 *.pyc
 sandbox
 .settings
+tonerecorder/samples.sqlite3
