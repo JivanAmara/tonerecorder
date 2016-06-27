@@ -18,12 +18,13 @@ from time import sleep
 from uuid import uuid1
 import scipy.io.wavfile
 import numpy
-
 import django
 import mutagen.mp3
 import taglib
-
 from tonerecorder.models import RecordedSyllable
+import logging
+
+logger = logging.getLogger(__name__)
 
 NORMALIZE_VERSION = '0.1'
 
@@ -50,7 +51,7 @@ sndhdr.whathdr_stringio = whathdr_stringio
 def convert_wav_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
     nrecs = RecordedSyllable.objects.count()
-    print('Converting {} Samples'.format(nrecs))
+    print('Converting {} Samples to wav format w/ standard sample rate of 14400'.format(nrecs))
 
     for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
         if rs.content_as_wav and rs.normalize_version == NORMALIZE_VERSION:
@@ -61,11 +62,11 @@ def convert_wav_all(remove_files=True):
         try:
             extension, sample_rate, audio_length = get_metadata(rs)
         except OSError:
-            print('problem getting metadata for: {}-{}{}.{}'.format(
+            logger.error('problem getting metadata for: {}-{}{}.{}'.format(
                 rs.user.username, rs.syllable.sound, rs.syllable.tone, rs.file_extension
                 )
             )
-            continue
+            extension, sample_rate, audio_length = (rs.file_extension, None, None)
 
         if extension == 'wav' and sample_rate == 44100:
             rs.content_as_wav = rs.content
@@ -155,6 +156,10 @@ def get_metadata(rs):
     """ Returns the file extension, sample rate, and audio length for the .content
         property of the RecordedSyllable passed.
     """
+    logger.info(
+        'get_metadata() for rs w/ id ({}), file extension: {}'.format(rs.id, rs.file_extension)
+    )
+    sys.stdout.flush()
     # In-Memory 'file'
     f = cStringIO.StringIO(rs.content)
     audio_details = sndhdr.whathdr_stringio(f)
@@ -163,18 +168,23 @@ def get_metadata(rs):
         (type, sample_rate, channels, frames, bits_per_sample) = audio_details
         audio_metadata = (rs.file_extension, sample_rate, None)
     else:
-        ntf = NamedTemporaryFile(delete=False, suffix='.{}'.format(rs.file_extension))
+        ntf = NamedTemporaryFile(suffix='.{}'.format(rs.file_extension))
         ntf.write(rs.content)
-        ntf.close()
+        ntf.seek(0)
 
         try:
             tlinfo = taglib.File(ntf.name)
             sample_rate = tlinfo.sampleRate
-            audio = mutagen.mp3.MP3(ntf.name)
-            audio_length = audio.info.length
+            try:
+#             if rs.file_extension not in ['amr', 'wma']:
+                audio = mutagen.mp3.MP3(ntf.name)
+                audio_length = audio.info.length
+            except mutagen.mp3.HeaderNotFoundError:
+#             else:
+                audio_length = None
             audio_metadata = (rs.file_extension, sample_rate, audio_length)
         finally:
-            os.unlink(ntf.name)
+            ntf.close()
 
     return audio_metadata
 
