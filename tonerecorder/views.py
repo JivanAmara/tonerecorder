@@ -20,6 +20,8 @@ from hanzi_basics.models import PinyinSyllable
 from tonerecorder.models import RecordedSyllable
 from tonerecorder.file_samples import content_filename
 from tempfile import NamedTemporaryFile
+from django.db.models.aggregates import Count
+from django.utils.decorators import method_decorator
 
 AUDIOFILE_DIR = os.path.join(os.path.dirname(__file__), 'audio_files')
 
@@ -123,3 +125,21 @@ def get_unrecorded_syllable(user):
             break
 
     return (next_to_record, i)
+
+class RecordingCountPerUser(View):
+    def get(self, request):
+        rss = RecordedSyllable.objects.values('user__username')\
+                .annotate(nrecordings=Count('user__username'))
+
+        trs = []
+        for rs in rss:
+            tr = '<tr><td>{}</td><td>{}</td></tr>'.format(rs['user__username'], rs['nrecordings'])
+            trs.append(tr)
+
+        table = '<table>{}</table>'.format('\n'.join(trs))
+        ret = HttpResponse(table)
+        return ret
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return View.dispatch(self, request, *args, **kwargs)

@@ -12,6 +12,7 @@ from hanzi_basics.models import PinyinSyllable
 
 @python_2_unicode_compatible
 class RecordedSyllable(models.Model):
+    recording_ok = models.NullBooleanField()
     user = models.ForeignKey(User)
     timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     syllable = models.ForeignKey(PinyinSyllable)

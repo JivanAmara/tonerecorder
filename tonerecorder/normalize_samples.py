@@ -50,10 +50,10 @@ sndhdr.whathdr_stringio = whathdr_stringio
 
 def convert_wav_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
-    nrecs = RecordedSyllable.objects.count()
+    nrecs = RecordedSyllable.objects.filter(recording_ok=True).count()
     print('Converting {} Samples to wav format w/ standard sample rate of 14400'.format(nrecs))
 
-    for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
+    for rs in RecordedSyllable.objects.all().filter(recording_ok=True).select_related('user', 'syllable'):
         if rs.content_as_wav and rs.normalize_version == NORMALIZE_VERSION:
             print('o', end='')
             sys.stdout.flush()
@@ -101,14 +101,14 @@ def convert_wav_all(remove_files=True):
 
 def normalize_volume_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
-    nrecs = RecordedSyllable.objects.count()
+    nrecs = RecordedSyllable.objects.filter(recording_ok=True).count()
     print('Normalizing Volume for {} Samples'.format(nrecs))
 
     print('. Making normalized version')
     print('o Normalized version already exists')
     print('- Normalized version matches original')
     print('x No wav content to normalize')
-    for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
+    for rs in RecordedSyllable.objects.filter(recording_ok=True).select_related('user', 'syllable'):
         if rs.content_as_normalized_wav and rs.normalize_version == NORMALIZE_VERSION:
             print('o', end='')
             sys.stdout.flush()
@@ -143,14 +143,6 @@ def normalize_volume_all(remove_files=True):
             print('.', end='')
             sys.stdout.flush()
     print()
-
-def analyze_all():
-    nrecs = RecordedSyllable.objects.count()
-    print('Analyzing {} Samples'.format(nrecs))
-
-    for rs in RecordedSyllable.objects.all().select_related('user', 'syllable'):
-        extension, sample_rate, audio_length = get_metadata(rs)
-        print(extension, sample_rate, audio_length)
 
 def get_metadata(rs):
     """ Returns the file extension, sample rate, and audio length for the .content
@@ -193,12 +185,12 @@ def strip_silence_all(recalculate=False):
             RecordedSyllable.content_as_silence_stripped_wav with preceding & trailing silence
             removed.
     '''
-    rs_count = RecordedSyllable.objects.count()
+    rs_count = RecordedSyllable.objects.filter(recording_ok=True).count()
     print('Stripping silence from {} RecordedSyllable objects'.format(rs_count))
     print('. Stripped silence')
     print('o Silence already stripped, ignoring')
     print('x Error reading RecordedSyllable.content_as_normalized_wav')
-    for rs in RecordedSyllable.objects.all():
+    for rs in RecordedSyllable.objects.filter(recording_ok=True):
         if recalculate:
             rs.content_as_silence_stripped_wav = None
 
@@ -316,9 +308,7 @@ if __name__ == '__main__':
     from tonerecorder.models import RecordedSyllable
     from django.contrib.auth.models import User
 
-    if args.subcommand == 'analyze':
-        analyze_all()
-    elif args.subcommand == 'makewav':
+    if args.subcommand == 'makewav':
         convert_wav_all(remove_files=not args.keep_files)
     elif args.subcommand == 'normalize_volume':
         normalize_volume_all()
