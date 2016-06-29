@@ -16,15 +16,16 @@ import django
 
 def file_metadata(filepath):
     ''' Returns a dictionary with information on the contents of the file (based on the filename).
-        Keys are: 'speaker_name', 'sound', 'tone', 'extension'.
+        Keys are: 'speaker_name', 'sound', 'tone', 'review_status', 'extension'.
     '''
     filename = os.path.split(filepath)[1]
-    metadata_regex = '(?P<speaker_name>[\w\.]+)--\d--(?P<sound>\w+)--(?P<tone>\d)--\d.(?P<extension>.*)$'
+    metadata_regex = '(?P<speaker_name>[\w\.]+)--(?P<sound>\w+)--(?P<tone>\d)--(?P<review_status>\w).(?P<extension>.*)$'
     result = re.match(metadata_regex, filename)
 
     if result:
         metadata = {
-            field: result.group(field) for field in ['speaker_name', 'sound', 'tone', 'extension']
+            field: result.group(field)
+                for field in ['speaker_name', 'sound', 'tone', 'review_status', 'extension']
         }
     else:
         metadata = None
@@ -76,8 +77,18 @@ def load_file(filepath):
         else:
             ret = 'already loaded'
     else:
+        if md['review_status'] == 'N':
+            review_status = None
+        elif md['review_status'] == 'T':
+            review_status = True
+        elif md['review_status'] == 'F':
+            review_status = False
+        else:
+            raise Exception('Unexpected review_status code: {}'.format(md['review_status']))
+
         rs = RecordedSyllable(
-            user=user, syllable=syllable, content=content, file_extension=md['extension']
+            user=user, syllable=syllable, content=content,
+            recording_ok=review_status, file_extension=md['extension']
         )
         rs.save()
         ret = None
@@ -123,10 +134,19 @@ def load_all(sample_archive_directory):
 
 def content_filename(rs):
     """ Returns a filename for the content field of the RecordedSyllable passed.
-        The string has the form: '<speaker-name>--0--<sound>--<tone>--0.<extension>'
+        The string has the form: '<speaker-name>--<sound>--<tone>--<review-status>.<extension>'
     """
-    fname = '{}--0--{}--{}--0.{}'.format(
-        rs.user.username, rs.syllable.sound, rs.syllable.tone, rs.file_extension
+    if rs.recording_ok is None:
+        review_status = 'N'
+    elif rs.recording_ok == True:
+        review_status = 'T'
+    elif rs.recording_ok == False:
+        review_status = 'F'
+    else:
+        raise Exception('Unexpected value for rs.recording_ok: {}'.format(rs.recording_ok))
+
+    fname = '{}--{}--{}--{}.{}'.format(
+        rs.user.username, rs.syllable.sound, rs.syllable.tone, review_status, rs.file_extension
     )
     return fname
 
@@ -139,7 +159,7 @@ def content_as_wav_filename(rs):
 
 def dump_all(dirpath):
     """ Dumps all RecordedSyllables to files in *dirpath*.
-        Naming convention is '<speaker-name>--0--<sound>--<tone>--0.<extension>'
+        Naming convention is '<speaker-name>--<sound>--<tone>--<review-status>.<extension>'
     """
     from tonerecorder.models import RecordedSyllable
     if not os.path.exists(dirpath):
@@ -208,6 +228,12 @@ def dump_wav(rs):
         wavfile.write(rs.content_as_wav)
     return fname
 
+def dump_fully_normalized_wav(rs):
+    fname = 'normalized-' + content_as_wav_filename(rs)
+    with open(fname, 'wb') as wavfile:
+        wavfile.write(rs.content_as_silence_stripped_wav)
+    return fname
+
 # Full path to the directory containing this file.
 
 DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
@@ -234,6 +260,11 @@ if __name__ == '__main__':
     dumpwav_parser.add_argument(
         'rsid', type=int, help='Id of the RecordedSyllable to dump as .wav'
     )
+    dumpnormal_parser = subparsers.add_parser('dumpnormal', help=helpmsg)
+    dumpnormal_parser.set_defaults(subcommand='dumpnormal')
+    dumpnormal_parser.add_argument(
+        'rsid', type=int, help='Id of the RecordedSyllable to dump as .wav'
+    )
 
     args = parser.parse_args()
 
@@ -254,5 +285,8 @@ if __name__ == '__main__':
     elif args.subcommand == 'dumpwav':
         rs = RecordedSyllable.objects.get(id=args.rsid)
         dump_wav(rs)
+    elif args.subcommand == 'dumpnormal':
+        rs = RecordedSyllable.objects.get(id=args.rsid)
+        dump_fully_normalized_wav(rs)
     else:
         raise Exception('Unexpected subcommand {}'.format(args.subcommand))
