@@ -5,26 +5,33 @@ Created on Apr 21, 2016
 '''
 from __future__ import print_function
 
+from Tkinter import Tk
 import argparse
 import cStringIO
 import hashlib
+import logging
 import os, sys
-import re
+import shutil
 import sndhdr
 from subprocess import Popen
 import subprocess
 from tempfile import NamedTemporaryFile
 from time import sleep
 from uuid import uuid1
-import scipy.io.wavfile
-import numpy
+
 import django
+from guppy import hpy
 import mutagen.mp3
 import taglib
-from tonerecorder.models import RecordedSyllable
-import logging
+from tkSnack import initializeSnack, Sound
+
+import resource  # @UnresolvedImport
+
 
 logger = logging.getLogger(__name__)
+
+root = Tk()
+initializeSnack(root)
 
 NORMALIZE_VERSION = '0.1'
 
@@ -47,6 +54,94 @@ def whathdr_stringio(sio):
     return None
 sndhdr.whathdr_stringio = whathdr_stringio
 
+def get_metadata(rs):
+    """ Returns the file extension, sample rate, and audio length for the .content
+        property of the RecordedSyllable passed.
+    """
+    logger.info(
+        'get_metadata() for rs w/ id ({}), file extension: {}'.format(rs.id, rs.file_extension)
+    )
+    sys.stdout.flush()
+    # In-Memory 'file'
+    f = cStringIO.StringIO(rs.content)
+    audio_details = sndhdr.whathdr_stringio(f)
+
+    if audio_details:
+        (type, sample_rate, channels, frames, bits_per_sample) = audio_details
+        audio_metadata = (rs.file_extension, sample_rate, None)
+    else:
+        ntf = NamedTemporaryFile(suffix='.{}'.format(rs.file_extension))
+        ntf.write(rs.content)
+        ntf.seek(0)
+
+        try:
+            tlinfo = taglib.File(ntf.name)
+            sample_rate = tlinfo.sampleRate
+            try:
+#             if rs.file_extension not in ['amr', 'wma']:
+                audio = mutagen.mp3.MP3(ntf.name)
+                audio_length = audio.info.length
+            except mutagen.mp3.HeaderNotFoundError:
+#             else:
+                audio_length = None
+            audio_metadata = (rs.file_extension, sample_rate, audio_length)
+        finally:
+            ntf.close()
+
+    return audio_metadata
+
+def get_file_metadata(filepath):
+    """ *brief*: Returns the file extension, sample rate, and audio length for the audio file located at
+            *filepath*.
+    """
+    try:
+        file_extension = filepath.split('.')[:-1]
+    except IndexError:
+        file_extension = None
+
+    with open(filepath, 'rb') as f:
+        audio_details = sndhdr.whathdr_stringio(f)
+
+    if audio_details:
+        (type, sample_rate, channels, frames, bits_per_sample) = audio_details
+        audio_metadata = (file_extension, sample_rate, None)
+    else:
+        tlinfo = taglib.File(filepath)
+        sample_rate = tlinfo.sampleRate
+        try:
+            audio = mutagen.mp3.MP3(filepath)
+            audio_length = audio.info.length
+        except mutagen.mp3.HeaderNotFoundError:
+            audio_length = None
+        audio_metadata = (file_extension, sample_rate, audio_length)
+
+    return audio_metadata
+
+def convert_wav(infile_path, outfile_path):
+    ''' *brief*: Converts *infile_path* to a single channel wav file with sampling rate of 44100
+            and writes the result to *outfile_path*.
+    '''
+    extension, sample_rate, audio_length = get_file_metadata(infile_path)
+    if extension is None:
+        raise Exception('infile_path has invalid audio extension')
+
+    if extension == 'wav' and sample_rate == 44100:
+        shutil.copy(infile_path, outfile_path)
+    else:
+        # -ac is audio channel count
+        # -ar is audio sample rate
+        cmd = [
+            'avconv', '-i', infile_path,
+            '-ac', '1', '-ar', '44100', outfile_path
+        ]
+        with open(os.devnull) as nullfile:
+#             retcode = subprocess.call(cmd, stdout=nullfile, stderr=nullfile)
+            p = Popen(cmd, stdout=nullfile, stderr=nullfile)
+        p.wait()
+        if p.returncode != 0:
+            msg = '\nretcode {} for:\n{}'.format(p.returncode, ' '.join(cmd))
+            logger.error(msg)
+            raise Exception(msg)
 
 def convert_wav_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
@@ -99,6 +194,23 @@ def convert_wav_all(remove_files=True):
         sys.stdout.flush()
     print()
 
+def normalize_volume(infile_path, outfile_path):
+    ''' *brief*: Uses command-line tool 'normalize-audio' to normalize the volume of *infile_path*
+            and writing the normalized audio to *outfile_path*
+    '''
+    try:
+        shutil.copyfile(infile_path, outfile_path)
+        cmd = ['normalize-audio', '-q', outfile_path]
+        p = Popen(cmd)
+        p.wait()
+        if p.returncode != 0:
+            msg = 'Non-zero return code {} from {}'.format(p.returncode, cmd)
+            logger.error(msg)
+            raise Exception(msg)
+    except:
+        os.unlink(outfile_path)
+        raise
+
 def normalize_volume_all(remove_files=True):
     print('Process {} remove intermediary files.'.format('will' if remove_files else 'will not'))
     nrecs = RecordedSyllable.objects.filter(recording_ok=True).count()
@@ -108,160 +220,226 @@ def normalize_volume_all(remove_files=True):
     print('o Normalized version already exists')
     print('- Normalized version matches original')
     print('x No wav content to normalize')
-    for rs in RecordedSyllable.objects.filter(recording_ok=True).select_related('user', 'syllable'):
-        if rs.content_as_normalized_wav and rs.normalize_version == NORMALIZE_VERSION:
-            print('o', end='')
-            sys.stdout.flush()
-            continue
+    # Break the RecordedSyllable retrieval up into chunks to limit memory usage.
+    qschunksize = 500
+    qschunks = [
+        RecordedSyllable.objects.filter(recording_ok=True)\
+            .select_related('user', 'syllable')[i:i + qschunksize]
+            for i in range(0, nrecs - qschunksize, qschunksize)
+    ]
+    for qschunk in qschunks:
+        for rs in qschunk:
+            if rs.content_as_normalized_wav and rs.normalize_version == NORMALIZE_VERSION:
+                print('o', end='')
+                sys.stdout.flush()
+                continue
 
-        if not rs.content_as_wav:
-            print('x', end='')
-            sys.stdout.flush()
-            continue
-        rs.content_as_normalized_wav = None
+            if not rs.content_as_wav:
+                print('x', end='')
+                sys.stdout.flush()
+                continue
+            rs.content_as_normalized_wav = None
 
-        wavfile = NamedTemporaryFile(delete=False)
-        hash1 = hashlib.sha224(rs.content_as_wav).hexdigest()
-        wavfile.write(rs.content_as_wav)
-        wavfile.close()
+            wavfile = NamedTemporaryFile(delete=False)
+            hash1 = hashlib.sha224(rs.content_as_wav).hexdigest()
+            wavfile.write(rs.content_as_wav)
+            wavfile.close()
 
-        p = Popen(['normalize-audio', '-q', wavfile.name])
-        if p.wait() != 0:
-            print('x', end='')
-            sys.stdout.flush()
-            continue
+            p = Popen(['normalize-audio', '-q', wavfile.name])
+            if p.wait() != 0:
+                print('x', end='')
+                sys.stdout.flush()
+                continue
 
-        with open(wavfile.name) as f:
-            rs.content_as_normalized_wav = f.read()
-            rs.normalize_version = NORMALIZE_VERSION
-            rs.save()
-        os.unlink(wavfile.name)
-        hash2 = hashlib.sha224(rs.content_as_normalized_wav).hexdigest()
-        if hash1 == hash2:
-            print('-', end='')
-        else:
-            print('.', end='')
-            sys.stdout.flush()
+            with open(wavfile.name) as f:
+                rs.content_as_normalized_wav = f.read()
+                rs.normalize_version = NORMALIZE_VERSION
+                rs.save()
+            os.unlink(wavfile.name)
+            hash2 = hashlib.sha224(rs.content_as_normalized_wav).hexdigest()
+            if hash1 == hash2:
+                print('-', end='')
+            else:
+                print('.', end='')
+                sys.stdout.flush()
     print()
 
-def get_metadata(rs):
-    """ Returns the file extension, sample rate, and audio length for the .content
-        property of the RecordedSyllable passed.
-    """
-    logger.info(
-        'get_metadata() for rs w/ id ({}), file extension: {}'.format(rs.id, rs.file_extension)
-    )
-    sys.stdout.flush()
-    # In-Memory 'file'
-    f = cStringIO.StringIO(rs.content)
-    audio_details = sndhdr.whathdr_stringio(f)
+def strip_silence(infile_path, outfile_path):
+    try:
+        s = Sound()
+        s.load(infile_path)
 
-    if audio_details:
-        (type, sample_rate, channels, frames, bits_per_sample) = audio_details
-        audio_metadata = (rs.file_extension, sample_rate, None)
-    else:
-        ntf = NamedTemporaryFile(suffix='.{}'.format(rs.file_extension))
-        ntf.write(rs.content)
-        ntf.seek(0)
+        pitches = s.pitch()
+        if pitches is None:
+            return None
 
-        try:
-            tlinfo = taglib.File(ntf.name)
-            sample_rate = tlinfo.sampleRate
-            try:
-#             if rs.file_extension not in ['amr', 'wma']:
-                audio = mutagen.mp3.MP3(ntf.name)
-                audio_length = audio.info.length
-            except mutagen.mp3.HeaderNotFoundError:
-#             else:
-                audio_length = None
-            audio_metadata = (rs.file_extension, sample_rate, audio_length)
-        finally:
-            ntf.close()
+        sample_count = s.length()
 
-    return audio_metadata
+        # Determine the segments of continuous non-zero pitch as 2-tuples (start-idx, end-idx)
+        nonzero_segments = []
+        start = None
+        end = None
+        for i, p in enumerate(pitches):
+            if start is None and p == 0.0:
+                continue
+            elif start is None and p != 0.0:
+                start = i
+            elif start is not None and p == 0.0:
+                end = i - 1
+                nonzero_segments.append((start, end))
+                start = None
+                end = None
+                continue
+            elif start is not None and i == (len(pitches) - 1):
+                end = i
+                nonzero_segments.append((start, end))
+
+        # Determine the longest segment and cut the sound to only include those samples
+        longest_segment = (0, 0)
+        for nzs in nonzero_segments:
+            if nzs[1] - nzs[0] > longest_segment[1] - longest_segment[0]:
+                longest_segment = nzs
+        samples_per_pitch_value = sample_count / float(len(pitches))
+        longest_segment_in_samples = (
+            int(samples_per_pitch_value * longest_segment[0]),
+            int(samples_per_pitch_value * longest_segment[1])
+        )
+
+        # If there's nothing left, raise an exception
+        if longest_segment_in_samples[1] - longest_segment_in_samples[0] == 0:
+            raise('No data left after stripping')
+        # We're good to go, write the trimmed audio.
+        else:
+            s.cut(longest_segment_in_samples[1], sample_count - 1)
+            s.cut(0, longest_segment_in_samples[0])
+
+            s.write(outfile_path)
+    finally:
+        # tkSnack is a c library and the memory it uses won't get garbage collected.
+        # Release the memory it's using with this.
+        s.destroy()
 
 def strip_silence_all(recalculate=False):
     ''' Copies RecordedSyllable.content_as_normalized_wav to
             RecordedSyllable.content_as_silence_stripped_wav with preceding & trailing silence
             removed.
     '''
-    rs_count = RecordedSyllable.objects.filter(recording_ok=True).count()
+    rs_count = RecordedSyllable.objects.filter(recording_ok=True)\
+                   .exclude(content_as_normalized_wav=None).count()
     print('Stripping silence from {} RecordedSyllable objects'.format(rs_count))
     print('. Stripped silence')
     print('o Silence already stripped, ignoring')
     print('x Error reading RecordedSyllable.content_as_normalized_wav')
-    for rs in RecordedSyllable.objects.filter(recording_ok=True):
-        if recalculate:
-            rs.content_as_silence_stripped_wav = None
+    rschunksize = 1000
+    for chunkstart in range(0, rs_count - rschunksize, rschunksize):
+        print('Memory usage before chunk[{}:{}]: {}'\
+              .format(
+                  chunkstart, chunkstart + rschunksize,
+                  resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+        )
+        rschunk = RecordedSyllable.objects.filter(recording_ok=True)\
+            .exclude(content_as_normalized_wav=None)\
+            .select_related('user', 'syllable')[chunkstart:chunkstart + rschunksize].iterator()
 
-        if rs.content_as_silence_stripped_wav and rs.normalize_version == NORMALIZE_VERSION:
-            print('o', end='')
+
+#         hp = hpy()
+#         before = hp.heap()
+#         leftovers = []
+        for rs in rschunk:
+            if recalculate:
+                rs.content_as_silence_stripped_wav = None
+
+            if rs.content_as_silence_stripped_wav is not None \
+                and rs.normalize_version == NORMALIZE_VERSION:
+                print('o', end='')
+                sys.stdout.flush()
+                continue
+
+            if rs.content_as_normalized_wav is None:
+                print('x', end='')
+                sys.stdout.flush()
+                continue
+
+            stripped_content = strip_silence_from_data(rs.content_as_normalized_wav)
+
+            if stripped_content is None:
+                print('x', end='')
+                sys.stdout.flush()
+                continue
+
+            rs.content_as_silence_stripped_wav = stripped_content
+            rs.normalize_version = NORMALIZE_VERSION
+#             leftovers.append(hp.heap() - before)
+            rs.save()
+#             leftovers.append(hp.heap() - before)
+            print('.', end='')
             sys.stdout.flush()
+        print('Memory usage after chunk[{}:{}]: {}'\
+              .format(
+                  chunkstart, chunkstart + rschunksize,
+                  resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+        )
+#         for i, leftover in enumerate(leftovers):
+#             print('Heap diff{}:\n{}'.format(i, leftover))
+
+def strip_silence_from_data(wave_file_data):
+    # Write wave data to a file so ntSnack can load it.
+    with NamedTemporaryFile() as ntf:
+        ntf.write(wave_file_data)
+        s = Sound()
+        s.load(ntf.name)
+
+    pitches = s.pitch()
+    if pitches is None:
+        return None
+
+    sample_count = s.length()
+
+    # Determine the segments of continuous non-zero pitch as 2-tuples (start-idx, end-idx)
+    nonzero_segments = []
+    start = None
+    end = None
+    for i, p in enumerate(pitches):
+        if start is None and p == 0.0:
             continue
-
-        if rs.content_as_normalized_wav is None:
-            print('x', end='')
-            sys.stdout.flush()
+        elif start is None and p != 0.0:
+            start = i
+        elif start is not None and p == 0.0:
+            end = i - 1
+            nonzero_segments.append((start, end))
+            start = None
+            end = None
             continue
+        elif start is not None and i == (len(pitches) - 1):
+            end = i
+            nonzero_segments.append((start, end))
 
-        sio_in = cStringIO.StringIO(rs.content_as_normalized_wav)
-        stripped_content = strip_silence(sio_in)
-        sio_in.close()
-        if stripped_content is None:
-            print('x', end='')
-            sys.stdout.flush()
-            continue
+    # Determine the longest segment and cut the sound to only include those samples
+    longest_segment = (0, 0)
+    for nzs in nonzero_segments:
+        if nzs[1] - nzs[0] > longest_segment[1] - longest_segment[0]:
+            longest_segment = nzs
+    samples_per_pitch_value = sample_count / float(len(pitches))
+    longest_segment_in_samples = (
+        int(samples_per_pitch_value * longest_segment[0]),
+        int(samples_per_pitch_value * longest_segment[1])
+    )
 
-        sio_out = cStringIO.StringIO()
-        scipy.io.wavfile.write(sio_out, 44100, stripped_content)
-        rs.content_as_silence_stripped_wav = sio_out.getvalue()
-        sio_out.close()
-        rs.normalize_version = NORMALIZE_VERSION
-        rs.save()
-        print('.', end='')
-        sys.stdout.flush()
-    print()
+    # If there's nothing left, return None
+    if longest_segment_in_samples[1] - longest_segment_in_samples[0] == 0:
+        stripped_content = None
+    else:
+        s.cut(longest_segment_in_samples[1], sample_count - 1)
+        s.cut(0, longest_segment_in_samples[0])
 
-def strip_silence(wave_file, show_graph=False):
-    ''' Removes low-volume data from the beginning and end of *wave_data*.
-    '''
-    try:
-        sample_rate, wave_data = scipy.io.wavfile.read(wave_file)
-    except ValueError as ex:
-        if ex.message == "Unknown wave file format":
-            return None
-    if show_graph:
-        from matplotlib import pyplot as plt
-        x = numpy.arange(len(wave_data))
-        plt.subplot(211)
-        plt.plot(x, wave_data)
-        plt.subplot(212)
+        with NamedTemporaryFile(suffix='.wav') as ntfout:
+            s.write(ntfout.name)
+            ntfout.seek(0)
+            stripped_content = ntfout.read()
+        s.destroy()
 
-    # make 10ms chunk size
-    chunk_size = int(44100.0 * 0.010)
-#     print('Chunk size for 10ms: {}'.format(chunk_size))
-    signal_start = 0  # Index where silence ends and signal starts
-    silence_threshold = 800
-    volume_found = 0
-    while volume_found < silence_threshold and signal_start < (len(wave_data) - chunk_size):
-        chunk = wave_data[signal_start:signal_start + chunk_size]
-        volume_found = numpy.mean(abs(chunk))
-        signal_start += chunk_size
+    return stripped_content
 
-    volume_found = 0
-    signal_end = len(wave_data)
-    while volume_found < silence_threshold and signal_end >= chunk_size:
-        chunk = wave_data[signal_end - chunk_size:signal_end]
-        volume_found = numpy.mean(abs(chunk))
-        signal_end -= chunk_size
-
-    stripped_wave_data = wave_data[signal_start:signal_end]
-    if show_graph:
-        x = numpy.arange(len(stripped_wave_data))
-        plt.plot(x, stripped_wave_data)
-        plt.show()
-
-    return stripped_wave_data
 
 # Full path to the directory containing this file.
 DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
@@ -317,14 +495,10 @@ if __name__ == '__main__':
     elif args.subcommand == 'stripsilence1':
         rs = RecordedSyllable.objects.get(id=args.id)
         print('len(content_as_normalized_wav): {}'.format(len(rs.content_as_normalized_wav)))
-        sio_in = cStringIO.StringIO(rs.content_as_normalized_wav)
-        stripped_content = strip_silence(sio_in, show_graph=True)
-        sio_in.close()
+        stripped_content = strip_silence_from_data(rs.content_as_normalized_wav)
         print('len(stripped_content): {}'.format(len(stripped_content)))
-        sio_out = cStringIO.StringIO()
-        scipy.io.wavfile.write(sio_out, 44100, stripped_content)
-        out_wav_content = sio_out.getvalue()
-        sio_out.close()
+
+        out_wav_content = stripped_content
 
         with open('stripped.wav', 'w+') as of:
             of.write(out_wav_content)

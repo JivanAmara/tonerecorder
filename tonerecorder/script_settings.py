@@ -5,7 +5,7 @@ Created on April 8, 2016
 '''
 import os
 SECRET_KEY = 'Not important for testing'
-DEBUG = True
+DEBUG = False
 
 DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
 DBPATH = os.path.join(DIRPATH, 'samples.sqlite3')
@@ -16,6 +16,15 @@ DATABASES = {
         'NAME': DBPATH
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'webvdc',
+#        'USER': 'webvdc',
+#        'PASSWORD': 'webvdc',
+#    }
+#}
 
 INSTALLED_APPS = (
     'django.contrib.auth',

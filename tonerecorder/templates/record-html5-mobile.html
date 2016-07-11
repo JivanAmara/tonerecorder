@@ -18,7 +18,7 @@
 	<form action="{% url 'tonerecorder_upload-audio' %}" method="post" enctype="multipart/form-data">
 	   {% csrf_token %}
        <input name="syllable" id="syllable" type="hidden" value="{{syllable}}">
-	   Tap to record -><input name="audio" id="capture" type="file" accept="audio/*" capture>
+	   Tap to record -><input name="audio" id="capture" type="file" accept="audio/*" capture="microphone">
 	   When the recording is good, tap here to upload ->
 	   <input id="submit" type="submit" value="Upload">
 	</form>
