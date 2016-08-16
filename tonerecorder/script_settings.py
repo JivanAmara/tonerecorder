@@ -7,8 +7,11 @@ import os
 SECRET_KEY = 'Not important for testing'
 DEBUG = False
 
-DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
+DIRPATH = os.path.abspath(os.path.dirname(__file__))
 DBPATH = os.path.join(DIRPATH, 'samples.sqlite3')
+
+MEDIA_ROOT = os.path.join(DIRPATH, 'tonerecorder-media')
+SYLLABLE_AUDIO_DIR = 'audio-files'
 
 DATABASES = {
     'default': {
@@ -17,14 +20,14 @@ DATABASES = {
     }
 }
 
-#DATABASES = {
+# DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.postgresql_psycopg2',
 #        'NAME': 'webvdc',
 #        'USER': 'webvdc',
 #        'PASSWORD': 'webvdc',
 #    }
-#}
+# }
 
 INSTALLED_APPS = (
     'django.contrib.auth',

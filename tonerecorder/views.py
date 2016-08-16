@@ -1,5 +1,8 @@
 # coding=utf-8
-from StringIO import StringIO
+try:
+    from cStringIO import StringIO
+except:
+    from io import StringIO
 import json
 import os
 from random import randint

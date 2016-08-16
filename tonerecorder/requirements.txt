@@ -1,6 +1,16 @@
+# --- System-level dependencies:
+#   normalize-audio
+#   avconv
+
+# Link your distribution's versions of these into your virtualenv
+#scipy
+#numpy
+
+# Install tkSnack3 (currently in tonetutor/docker/dependencies/snack_2.2.10/python
+guppy   # who needs this?
+
 git+ssh://gitrepos/opt/gitrepos/hanzi_basics@v1.1.1#egg=hanzi-basics==1.1.1
+git+ssh://gitrepos/opt/gitrepos/ttlib.git@v0.2.2#ttlib==0.2.2
 django-user-agents==0.3.0
-scipy
-numpy
 mutagen
 pytaglib
