@@ -4,12 +4,17 @@ Created on Mar 16, 2016
 @author: jivan
 '''
 from __future__ import unicode_literals
+
+import datetime
+from fileinput import filename
+import os
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from hanzi_basics.models import PinyinSyllable
-from django.conf import settings
-import os
+
 
 @python_2_unicode_compatible
 class RecordedSyllable(models.Model):
@@ -25,7 +30,7 @@ class RecordedSyllable(models.Model):
     '''
     native = models.BooleanField(default=False)
     recording_ok = models.NullBooleanField()
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     syllable = models.ForeignKey(PinyinSyllable)
 
@@ -52,13 +57,24 @@ class RecordedSyllable(models.Model):
             raise(Exception('{} not a recognized audio sample state'.format(audio_version)))
         pipeline_index = pipeline_states.index(audio_version)
         file_extension = self.file_extension if pipeline_index == 0 else 'wav'
-        filename = '{speaker}--{sound}--{tone}--{index}.{audio_version}.{extension}'.format(
-                        speaker=self.user.username,
+        if self.native:
+            filename_template = '{speaker}--{sound}--{tone}--{index}.{audio_version}.{extension}'
+            timestamp = None
+        else:
+            filename_template = \
+                '{speaker}--{sound}--{tone}--{timestamp}--{index}.{audio_version}.{extension}'
+            timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+
+        username = 'None' if self.user is None else self.user.username
+
+        filename = filename_template.format(
+                        speaker=username,
                         sound=self.syllable.sound,
                         tone=self.syllable.tone,
+                        timestamp=timestamp,
                         index=pipeline_index,
                         audio_version=audio_version,
-                        extension=file_extension
+                        extension=file_extension,
                         )
 
         os.makedirs(os.path.join(settings.MEDIA_ROOT, settings.SYLLABLE_AUDIO_DIR), exist_ok=True)

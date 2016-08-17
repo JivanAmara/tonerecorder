@@ -6,7 +6,7 @@ Dependencies:
 
 Add: 'django_user_agents.middleware.UserAgentMiddleware' to middleware of containing project
     if you plan to use recording view.
-Add: SYLLABLE_AUDIO_DIR to settings of containg project.  This will be used as a subdirectory
+Add: SYLLABLE_AUDIO_DIR to settings of containing project.  This will be used as a subdirectory
     of MEDIA_ROOT to store audio files.
 Add: MEDIA_ROOT if you haven't already.
 
