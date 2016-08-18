@@ -57,7 +57,7 @@ class RecordedSyllable(models.Model):
             raise(Exception('{} not a recognized audio sample state'.format(audio_version)))
         pipeline_index = pipeline_states.index(audio_version)
         file_extension = self.file_extension if pipeline_index == 0 else 'wav'
-        if self.native:
+        if not hasattr(self, 'native') or self.native == True:
             filename_template = '{speaker}--{sound}--{tone}--{index}.{audio_version}.{extension}'
             timestamp = None
         else:
