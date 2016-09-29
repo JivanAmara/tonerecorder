@@ -89,9 +89,6 @@ class RecordedSyllable(models.Model):
 
         return urep
 
-    class Meta:
-        unique_together = ('user', 'syllable')
-
 def create_audio_path(rs, audio_version):
     ''' *rs* is a RecordedSyllable instance
         *audio_version* should be one of:
