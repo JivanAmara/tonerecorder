@@ -36,6 +36,8 @@ class RecordedSyllable(models.Model):
 
     # Full path to original audio
     audio_original = models.CharField(max_length=200, null=True)
+    # Full path to audio converted to mp3
+    audio_mp3 = models.CharField(max_length=200, null=True)
     # Full path to audio converted to wav
     audio_wav = models.CharField(max_length=200, null=True)
     # Full path to audio with normalized volume
@@ -50,13 +52,20 @@ class RecordedSyllable(models.Model):
     def create_audio_path(self, audio_version):
         ''' *rs* is a RecordedSyllable instance
             *audio_version* should be one of:
-                'original', 'wav', 'volume_normalized', 'silence_stripped'.
+                'original', 'mp3', 'wav', 'volume_normalized', 'silence_stripped'.
         '''
-        pipeline_states = ['original', 'wav', 'volume_normalized', 'silence_stripped']
+        pipeline_states = ['original', 'mp3', 'wav', 'volume_normalized', 'silence_stripped']
         if audio_version not in pipeline_states:
             raise(Exception('{} not a recognized audio sample state'.format(audio_version)))
         pipeline_index = pipeline_states.index(audio_version)
-        file_extension = self.file_extension if pipeline_index == 0 else 'wav'
+
+        if audio_version == 'mp3':
+            file_extension = 'mp3'
+        elif audio_version == 'original':
+            file_extension = self.file_extension
+        else:
+            file_extension = 'wav'
+
         if not hasattr(self, 'native') or self.native == True:
             filename_template = '{speaker}--{sound}--{tone}--{index}.{audio_version}.{extension}'
             timestamp = None
