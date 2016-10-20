@@ -7,14 +7,17 @@ from __future__ import unicode_literals
 
 import datetime
 from fileinput import filename
+import hashlib
 import os
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
 from django.utils.encoding import python_2_unicode_compatible
 from hanzi_basics.models import PinyinSyllable
-
+import logging
+logger = logging.getLogger(__name__)
 
 @python_2_unicode_compatible
 class RecordedSyllable(models.Model):
@@ -33,6 +36,8 @@ class RecordedSyllable(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     syllable = models.ForeignKey(PinyinSyllable)
+
+    original_md5hex = models.CharField(max_length=32, unique=True, null=True, blank=True)
 
     # Full path to original audio
     audio_original = models.CharField(max_length=200, null=True)
@@ -90,6 +95,18 @@ class RecordedSyllable(models.Model):
         audio_path = os.path.join(settings.MEDIA_ROOT, settings.SYLLABLE_AUDIO_DIR, filename)
         return audio_path
 
+    @staticmethod
+    def set_md5hex(sender=None, instance=None, **kwargs):
+        with open(instance.audio_original, 'rb') as f:
+            m = hashlib.md5()
+            m.update(f.read())
+            md5hex = m.hexdigest()
+            if instance.original_md5hex is not None and instance.original_md5hex != md5hex:
+                msg = 'MD5 changed for RecordedSyllable.audio_original with id: {}'\
+                          .format(instance.id)
+                logger.warn(msg)
+            instance.original_md5hex = md5hex
+
     def __str__(self):
         u_syl = "{}".format(self.syllable)
 
@@ -98,25 +115,4 @@ class RecordedSyllable(models.Model):
 
         return urep
 
-def create_audio_path(rs, audio_version):
-    ''' *rs* is a RecordedSyllable instance
-        *audio_version* should be one of:
-            'original', 'wav', 'volume_normalized', 'silence_stripped'.
-    '''
-    pipeline_states = ['original', 'wav', 'volume_normalized', 'silence_stripped']
-    if audio_version not in pipeline_states:
-        raise(Exception('{} not a recognized audio sample state'.format(audio_version)))
-    pipeline_index = pipeline_states.index(audio_version)
-    file_extension = rs.file_extension if pipeline_index == 0 else 'wav'
-    filename = '{speaker}--{sound}--{tone}--{index}--{audio_version}.{extension}'.format(
-                    speaker=rs.user.username,
-                    sound=rs.syllable.sound,
-                    tone=rs.syllable.tone,
-                    index=pipeline_index,
-                    audio_version=audio_version,
-                    extension=file_extension
-                    )
-
-    os.makedirs(os.path.join(settings.MEDIA_ROOT, settings.SYLLABLE_AUDIO_DIR), exist_ok=True)
-    audio_path = os.path.join(settings.MEDIA_ROOT, settings.SYLLABLE_AUDIO_DIR, filename)
-    return audio_path
+pre_save.connect(RecordedSyllable.set_md5hex, sender=RecordedSyllable)
