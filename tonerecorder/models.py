@@ -41,13 +41,14 @@ class RecordedSyllable(models.Model):
 
     # Full path to original audio
     audio_original = models.CharField(max_length=200, null=True)
-    # Full path to audio converted to mp3
+    # Full path to audio converted to mp3 (for easy presentation of originial for review)
     audio_mp3 = models.CharField(max_length=200, null=True)
+
     # Full path to audio converted to wav
     audio_wav = models.CharField(max_length=200, null=True)
-    # Full path to audio with normalized volume
+    # Full path to audio with normalized volume (wav)
     audio_normalized_volume = models.CharField(max_length=200, null=True)
-    # Full path to audio with silence stripped
+    # Full path to audio with silence stripped (wav)
     audio_silence_stripped = models.CharField(max_length=200, null=True)
 
     file_extension = models.CharField(max_length=40)
@@ -97,15 +98,16 @@ class RecordedSyllable(models.Model):
 
     @staticmethod
     def set_md5hex(sender=None, instance=None, **kwargs):
-        with open(instance.audio_original, 'rb') as f:
-            m = hashlib.md5()
-            m.update(f.read())
-            md5hex = m.hexdigest()
-            if instance.original_md5hex is not None and instance.original_md5hex != md5hex:
-                msg = 'MD5 changed for RecordedSyllable.audio_original with id: {}'\
-                          .format(instance.id)
-                logger.warn(msg)
-            instance.original_md5hex = md5hex
+        if instance and instance.audio_original and instance.original_md5hex is None:
+            with open(instance.audio_original, 'rb') as f:
+                m = hashlib.md5()
+                m.update(f.read())
+                md5hex = m.hexdigest()
+                if instance.original_md5hex is not None and instance.original_md5hex != md5hex:
+                    msg = 'MD5 changed for RecordedSyllable.audio_original with id: {}'\
+                              .format(instance.id)
+                    logger.warn(msg)
+                instance.original_md5hex = md5hex
 
     def __str__(self):
         u_syl = "{}".format(self.syllable)
