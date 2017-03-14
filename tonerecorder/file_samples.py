@@ -10,17 +10,21 @@ import hashlib
 import logging
 import os, sys
 import re
+from shutil import SameFileError
 import shutil
 
 import django
 from django.db import transaction
+from django.db.models.aggregates import Count
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
+from django.contrib.auth import get_user_model
 
 from tonerecorder.models import RecordedSyllable
 
 
+User = get_user_model()
 logger = logging.getLogger(__name__)
+
 
 def file_metadata(filepath):
     ''' Returns a dictionary with information on the contents of the file (based on the filename).
@@ -232,7 +236,7 @@ def dump_all(archive_dirpath):
     print('W DB missing wav file')
     print('N DB missing volume_normalized file')
     print('S DB missing silence_stripped file')
-    print('-')
+    print('- file already in archive')
     print('X Unexpected error, see log')
 
     missing_content = []
@@ -281,6 +285,8 @@ def dump_all(archive_dirpath):
                         shutil.copyfile(field_value, archive_filepath)
                         print('s', end='')
                     ncopied += 1
+                except SameFileError as ex:
+                    print('-', end='')
                 except Exception as ex:
                     logger.error(ex)
                     print('X', end='')
@@ -299,6 +305,7 @@ def dump_wav(rs):
         wavfile.write(rs.content_as_wav)
     return fname
 
+
 def dump_fully_normalized_wav(rs):
     fname = 'normalized-' + content_as_wav_filename(rs)
     with open(fname, 'wb') as wavfile:
@@ -313,7 +320,8 @@ def remove_nonexistent_paths():
 
     for rs in RecordedSyllable.objects.all():
         for _, audio_field in pipeline_index_field_by_tag.values():
-            if not os.path.exists(getattr(rs, audio_field)):
+            audio_file_path = getattr(rs, audio_field)
+            if audio_file_path is not None and not os.path.exists(audio_file_path):
                 setattr(rs, audio_field, None)
                 updated_rss.update({rs})
 
@@ -325,13 +333,38 @@ def remove_nonexistent_paths():
 
 
 def remove_empty_recordedsyllables():
-    RecordedSyllable.objects.filter(
+    """ Removes any RecordedSyllable instances which have None for audio_original,
+        audio_wav, audio_normalized_volume, audio_silence_stripped
+    """
+    empty_rss = RecordedSyllable.objects.filter(
         audio_original=None, audio_wav=None, audio_normalized_volume=None, audio_silence_stripped=None
-    ).delete()
+    )
+    n_empty = empty_rss.count()
+    empty_rss.delete()
+    logger.info('{} empty RecordedSyllble instances have been removed'.format(n_empty))
+
+
+def remove_users_with_no_recordedsyllables():
+    """ Removes unused User accounts.
+
+        Removes any User instances that aren't superuser or staff and
+        don't have any RecordedSyllable's associated with them. 
+    """
+    empty_users = User.objects.filter(is_staff=False, is_superuser=False)\
+        .annotate(num_recordings=Count('recordedsyllable__id'))\
+        .filter(num_recordings=0)
+    n_users = empty_users.count()
+    empty_users.delete()
+    logger.info('{} User instances with no associated RecordedSyllable instances removed'.format(n_users))
+
+
+def curate_db():
+    remove_nonexistent_paths()
+    remove_empty_recordedsyllables()
+    remove_users_with_no_recordedsyllables()
 
 
 # Full path to the directory containing this file.
-
 DIRPATH = os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
 
 if __name__ == '__main__':
